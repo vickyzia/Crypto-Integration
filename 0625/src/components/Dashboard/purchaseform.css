@@ -1,0 +1,114 @@
+
+.container {
+    min-height: 500px;
+    max-width: 1200px;
+    background-color: white;
+    color: black;
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .top {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-flow: column nowrap;
+    min-height: 200px;
+  }
+  
+  .bottom {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    margin: 20px;
+    flex-flow: column nowrap;
+    min-height: 300px;
+    border: 1px solid transparent;
+    box-shadow: 0 0 4px rgba(0, 30, 128, 0.8);
+    max-width: 600px;
+  }
+  
+  .flex_row {
+    display: flex;
+    flex-flow: row nowrap;
+  }
+  
+  .topLeft,
+  .topRight {
+    margin: 10px;
+  }
+  
+  .topRight {
+    display: flex;
+    flex-flow: row wrap;
+  }
+
+.contribute_input {
+  width: 300px;
+  background-color: transparent;
+  color: #111;
+  padding: 15px;
+  margin: 10px;
+  border: 1px solid transparent;
+  box-shadow: 0 0 4px rgba(0, 30, 128, 0.8);
+}
+
+.contribute_left{
+  width: 250px;
+  white-space: nowrap;
+  text-align: right;
+  padding: 5px 8px;
+}
+
+.contribute_right{
+  width: 200px;
+  white-space: nowrap;
+  text-align: left;
+  padding: 5px 8px;
+}
+
+.flex_justified{
+  justify-content: center;
+  align-items: center;
+}
+
+.disclaimer{
+  margin: 10px 20px;
+  padding: 15px;
+  border: 1px solid transparent;
+  box-shadow: 0 0 4px rgba(0, 30, 128, 0.8);
+  font-size: 14px;
+}
+
+.disclaimer2{
+  padding: 15px;  
+}
+
+.pay_buttons{
+  padding: 10px;
+}
+
+.pay_buttons button{
+  margin: 8px;
+  padding: 8px;
+  background-color: transparent;
+  border: 1px solid transparent;
+  box-shadow: 0 0 4px rgba(0, 30, 128, 0.8);
+}
+
+
+.title{
+  font-size: 32px;
+  font-weight: 700;
+  margin: 20px 0px;
+}
+
+.horizontal{
+  height: 1px;
+  border-bottom: 1px solid rgba(0,30,128,0.5);
+  width: 100%;
+  margin: 30px 0px;
+}
+
