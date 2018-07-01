@@ -29,9 +29,11 @@ app.use(passport.initialize());
 require('./config/passwort')(passport);
 
 const users = require('./routes/users');
+const payments = require('./routes/payments');
 
 // use of routes
 app.use('/api/users', users);
+app.use('/api/payments', payments);
 
 const port = process.env.PORT || 5000;
 

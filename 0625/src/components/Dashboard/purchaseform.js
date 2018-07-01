@@ -1,10 +1,19 @@
 import React, { Component } from "react";
 import "./purchaseform.css";
+import isEmpty from "lodash/isEmpty"
 import ReactDOM from "react-dom";
+import { AccountUnavailable } from "../MetaMask/account-unavailable";
+import { WrongNetwork } from "../MetaMask/wrong-network";
+import { ErrorWeb3 } from "../MetaMask/error-web3";
+import "../../utils/metaMask";
+import { isWeb3Available, getAccounts, getNetworkId } from "../../utils/metaMask";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+import {loadComplete} from "../../actions/paymentActions"
+import MetaMaskPaymentOption from "../MetaMask/metamask-payment-option"
 
 
 class DashboardICO extends Component {
-  componentDidMount() {}
   render() {
     return (
       <div className="container">
@@ -24,13 +33,20 @@ class DashboardICO extends Component {
             <div className="contribute_left">Tokens Purchased:</div>
             <div className="contribute_right"> X tokens</div>
           </div>
-          <div className="pay_buttons">
-            <button>Pay with Metamask</button>
-            <button>Pay with Coinpayments</button>
-          </div>
+          <MetaMaskPaymentOption />
         </div>
       </div>
     );
   }
 }
-export default DashboardICO;
+
+
+DashboardICO.propTypes = {
+  loadComplete: PropTypes.func.isRequired,
+};
+
+
+const mapStateToProps = state => ({
+});
+
+export default connect(mapStateToProps, {loadComplete}) (DashboardICO);

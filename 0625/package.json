@@ -7,10 +7,11 @@
     "body-parser": "^1.18.3",
     "bootstrap": "^4.1.1",
     "chart.js": "^1.1.1",
-    "express": "^4.16.3",
     "classnames": "^2.2.6",
+    "express": "^4.16.3",
     "jquery": "^2.1.4",
     "jwt-decode": "^2.2.0",
+    "lodash": "^4.17.10",
     "mdbreact": "^4.3.0",
     "neal-react": "^0.2.5",
     "rc-progress": "^2.2.5",
@@ -40,7 +41,8 @@
     "reactstrap": "^6.0.1",
     "recharts": "^1.0.0-beta.10",
     "redux": "^4.0.0",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "web3": "^0.20.6"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -57,7 +59,8 @@
   },
   "babel": {
     "presets": [
-      "es2015","react"
+      "es2015",
+      "react"
     ],
     "sourceMaps": true,
     "retainLines": true

@@ -6,10 +6,11 @@ const Wallet = require('../models/Wallet');
 const tokenValue = require('../config/token-value');
 const transactionMedium = require('../config/transaction-medium');
 const paymentStatus = require('../config/transaction-status');
+const coinTypes = require('../config/coin-types');
 const web3 = require('web3');
 const router = express.Router();
 
-router.post('payments/createTransaction',validateToken, (req,res)=>{
+router.post('/createTransaction',validateToken, (req,res)=>{
     const {errors, isValid} = paymentValidations.validateTransactionInput(req.body);
     var data = req.body;
     // Check validation
@@ -22,7 +23,7 @@ router.post('payments/createTransaction',validateToken, (req,res)=>{
                     errors.transactionId = 'Transaction with this id already exists';
                     return res.status(400).json(errors)
                 }
-                const newPayment;
+                var newPayment;
                 if(data.transactionMedium == transactionMedium.metamask){
                     Wallet.findOne({toAddress:data.toAddress})
                         .then(wallet=>{
@@ -61,9 +62,9 @@ function createPaymentObject(data){
         tokenValue : tokenValue.getTokenValue(data.paymentType)
     })
     return payment;
-}
+};
 
-router.get('payments/confirmTransaction',validateToken, (req,res) => {
+router.get('/confirmTransaction',validateToken, (req,res) => {
     const {errors, isValid} = paymentValidations.validateTransactionId(req.body);
     var data = req.body;
     // Check validation
@@ -109,9 +110,9 @@ router.get('payments/confirmTransaction',validateToken, (req,res) => {
             error.message = "Unable to create transaction at the moment."
             return res.status(500).json(errors);
         });
-})
+});
 
-router.get('payments/all', validateToken, (req,res) => {
+router.get('/all', validateToken, (req,res) => {
     var data = req.body;
     var errors = {}
     Payment.find({_userId:data.userId}).sort({createdAt:-1}),exec((err, payments)=>{
@@ -122,4 +123,22 @@ router.get('payments/all', validateToken, (req,res) => {
         }
         return res.status(200).json(payments);
     });
-})
+});
+
+//Load Token Value in BTC and Ether as well as Wallet Address list to work with MetaMask
+router.get('/loadPaymentData',validateToken, (req,res)=>{
+    var payload = {};
+    var errors = {};
+    payload.BtcTokenValue = tokenValue.getTokenValue(coinTypes.bitcoin);
+    payload.EtherTokenValue = tokenValue.getTokenValue(coinTypes.ether);
+    Wallet.find({},'publicKey',function(err,wallets){
+        if(err){
+            errors.message = err;
+            return res.status(500).json(errors);
+        }
+        payload.wallets = wallets;
+        return res.status(200).json(payload);
+    })
+});
+
+module.exports = router;

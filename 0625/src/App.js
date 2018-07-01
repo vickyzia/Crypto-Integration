@@ -3,14 +3,14 @@ import "./App.css";
 import Login from "./components/Login/login.js";
 import { Link } from "react-router-dom";
 import { BrowserRouter as Router, Route } from "react-router-dom";
-import { Provider } from "react-redux";
-import store from "./store";
 import Dashboard from "./components/Dashboard/dashboard";
 import jwt_decode from "jwt-decode";
 import setAuthToken from "./utils/setAuthToken";
 import { setCurrentUser, logoutUser } from "./actions/authActions";
 import Confirmation from "./components/Confirmation/confirmation";
 import AfterRegister from "./components/AfterRegister/after-register";
+import store from "./store";
+
 
 // Check for token
 if (localStorage.jwtToken) {
@@ -35,7 +35,6 @@ class App extends Component {
   componentDidMount() {}
   render() {
     return (
-      <Provider store={store}>
         <Router>
           <div>
             <Route exact path="/login" component={Login} />
@@ -44,7 +43,6 @@ class App extends Component {
             <Route exact path="/after-register" component={AfterRegister} />
           </div>
         </Router>
-      </Provider>
     );
   }
 }

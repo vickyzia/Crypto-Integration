@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { logoutUser } from "../../actions/authActions";
 import PurchaseForm from "./purchaseform.js";
 
+
 class Dashboard extends Component {
   componentDidMount() {
     if (!this.props.auth.isAuthenticated) {
