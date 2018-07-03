@@ -112,7 +112,7 @@ router.get('/confirmTransaction',validateToken, (req,res) => {
         });
 });
 
-router.get('/all', validateToken, (req,res) => {
+router.get('/userTransactions', validateToken, (req,res) => {
     var data = req.body;
     var errors = {}
     Payment.find({_userId:data.userId}).sort({createdAt:-1}),exec((err, payments)=>{

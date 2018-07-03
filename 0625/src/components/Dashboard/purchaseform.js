@@ -9,11 +9,18 @@ import "../../utils/metaMask";
 import { isWeb3Available, getAccounts, getNetworkId } from "../../utils/metaMask";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import {loadComplete} from "../../actions/paymentActions"
+import {loadComplete, updatePayment} from "../../actions/paymentActions"
 import MetaMaskPaymentOption from "../MetaMask/metamask-payment-option"
 
 
 class DashboardICO extends Component {
+  constructor(props){
+    super(props);
+    this.onAmountChange = this.onAmountChange.bind(this);
+  }
+  onAmountChange(event){
+    this.props.updatePayment(event.target.value);
+  }
   render() {
     return (
       <div className="container">
@@ -25,13 +32,15 @@ class DashboardICO extends Component {
                 className="contribute_input"
                 type="text"
                 placeholder="Amount of ETH to contribute"
+                onChange={this.onAmountChange}
               />
             </div>
             <div>ETH</div>
           </div>
           <div className="flex_row">
             <div className="contribute_left">Tokens Purchased:</div>
-            <div className="contribute_right"> X tokens</div>
+            <div className="contribute_right"> {this.props.paymentData!=null?
+              this.props.paymentData.EtherTokenValue*this.props.paymentAmount:0} tokens</div>
           </div>
           <MetaMaskPaymentOption />
         </div>
@@ -43,10 +52,15 @@ class DashboardICO extends Component {
 
 DashboardICO.propTypes = {
   loadComplete: PropTypes.func.isRequired,
+  updatePayment: PropTypes.func.isRequired,
+  paymentData: PropTypes.object,
+  paymentAmount: PropTypes.number
 };
 
 
 const mapStateToProps = state => ({
+  paymentData: state.payment.paymentData,
+  paymentAmount: state.payment.paymentAmount
 });
 
-export default connect(mapStateToProps, {loadComplete}) (DashboardICO);
+export default connect(mapStateToProps, {loadComplete, updatePayment}) (DashboardICO);

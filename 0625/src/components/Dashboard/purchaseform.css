@@ -69,6 +69,12 @@
   padding: 5px 8px;
 }
 
+.contribute_center{
+  width: 300px;
+  text-align: center;
+  padding: 0px 8px;
+}
+
 .flex_justified{
   justify-content: center;
   align-items: center;

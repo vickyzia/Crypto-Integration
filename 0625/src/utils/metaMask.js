@@ -15,3 +15,14 @@ export const isWeb3Available = () =>{
         return true;
     return false;
 }
+export const createTransaction = ({fromAddress, toAddress, amount}, callback) =>{
+    if(window.web3){
+        window.web3.eth.sendTransaction({
+            from: fromAddress,
+            to:toAddress,
+            value: window.web3.toWei(amount,'ether')
+        },callback);
+        return true;
+    }
+    return false;
+}
