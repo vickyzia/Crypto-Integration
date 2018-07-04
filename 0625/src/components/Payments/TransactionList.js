@@ -16,18 +16,21 @@ class TransactionList extends Component{
                     </tr>
                 </thead>
                 <tbody>
-                    <React.Fragment>
-                    
-                        <tr>
-                            <th scope="row"></th>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </React.Fragment>
+                    {this.props.transactionList.map(transaction => (
+                        <React.Fragment key={transaction.transactionId}>
+                            <tr>
+                                <th scope="row">{transaction.Id}</th>
+                                <td>{transaction.transactionId}</td>
+                                <td>{transaction.amount}</td>
+                                <td>{transaction.fromAddress}</td>
+                                <td>{transaction.toAddress}</td>
+                                <td>{transaction.status}</td>
+                                <td>{transaction.status == "pending" && transaction.medium == "metamask"?<button>Confirm</button>:""}</td>
+                            </tr>
+                        </React.Fragment>
+                    ))
+                        
+                    }
 
                 </tbody>
             </table>
