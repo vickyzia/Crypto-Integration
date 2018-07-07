@@ -10,6 +10,12 @@ const coinTypes = require('../config/coin-types');
 const Web3 = require('web3');
 const router = express.Router();
 
+var Coinpayments = require('coinpayments');
+var coinPaymentsClient = new Coinpayments({
+    key: '94850cce3d7bbd018077ecf3b8c89315c90836710f1ed4a16f64d1181567380d',
+    secret: 'f73f21154c9f00A19DF62C3EA63d1f834aD42afa5c46DeB25f858Cf4F1576Fd9'
+  }); 
+
 router.post('/createTransaction',validateToken, (req,res)=>{
     const {errors, isValid} = paymentValidations.validateTransactionInput(req.body);
     var data = req.body;
@@ -92,29 +98,13 @@ router.post('/confirmTransaction',validateToken, (req,res) => {
                 payment.transactionStatus == paymentStatus.completed){
                 return res.status(200).json(payment);
             }
-            let web3Http = new Web3(new Web3.providers.HttpProvider("https://ropsten.infura.io/vNqwZBGAgLsMUml2V9jp"));
-            web3Http.eth.getTransactionReceipt(data.transactionId, function(error, result){
-                if(!error){
-                    var status = paymentStatus.pending;
-                    if(result){
-                        status = result.status == "0x1" ? paymentStatus.completed
-                            :paymentStatus.cancelled;
-                        payment.transactionStatus = status;
-                        Payment.update({transactionId:data.transactionId, _userId:data.userId},{
-                            transactionStatus : status,
-                            completedAt: Date.Now
-                        }, function(err,affected,resp){
-                            return res.status(200).json(payment);
-                        });
-                    }
-                    else{
-                        return res.status(200).json(payment);
-                    }
-                }
-                else{
-                    return res.status(200).json(payment);
-                }
-            })
+            if(payment.transactionMedium == transactionMedium.metamask)
+            {
+                return res.status(200).json(confirmMetaMaskPayment(payment));
+            }
+            else{
+                return res.status(200).json(confirmCoinPaymentsPayment(payment));
+            }
         })
         .catch(err=>{
             console.log(err);
@@ -152,4 +142,82 @@ router.get('/loadPaymentData',validateToken, (req,res)=>{
     })
 });
 
+router.post('/createCoinPaymentsTransaction',validateToken, (req,res)=>{
+    const {errors, isValid} = paymentValidations.validateCoinPaymentsTransactionInput(req.body);
+    var data = req.body;
+    // Check validation
+    if (!isValid) {
+        return res.status(400).json(errors);
+    }
+    coinPaymentsClient.createTransaction({
+        amount:data.amount,
+        currency1:data.currency,
+        currency2: data.currency,
+        buyer_email: data.email
+    },(err,result)=>{
+        if(err){
+            error.message = err;
+            return res.status(400).json(errors);
+        }
+        var newPayment = new Payment({
+            transactionId: result.txn_id,
+            paymentType: data.paymentType,
+            transactionMedium : transactionMedium.coinpayments,
+            tokenValue: tokenValue.getTokenValue(data.paymentType),
+            fromAddress: '', //User is yet to send payment so we can't determine the address yet.
+            toAddress: result.address,
+            statusUrl: result.status_url
+        });
+        newPayment.save()
+            .then(payment=>{
+                return res.status(200).json(payment);
+            })
+            .catch(err=>{
+                console.log(err);
+                error.message = "Unable to create transaction at the moment."
+                return res.status(500).json(errors);
+            });
+    });
+});
+
 module.exports = router;
+
+function confirmMetaMaskPayment(payment) {
+    let web3Http = new Web3(new Web3.providers.HttpProvider("https://ropsten.infura.io/vNqwZBGAgLsMUml2V9jp"));
+    web3Http.eth.getTransactionReceipt(payment.transactionId, function (error, result) {
+        if (!error && result) {
+            var status = paymentStatus.pending;
+            status = result.status == "0x1" ? paymentStatus.completed
+                : paymentStatus.cancelled;
+            payment.transactionStatus = status;
+            Payment.update({ transactionId: payment.transactionId, _userId: payment._userId }, {
+                transactionStatus: status,
+                completedAt: Date.Now
+            }, function (err, affected, resp) {
+                return payment;
+            });
+        }
+        else {
+            return payment;
+        }
+    });
+}
+
+function confirmCoinPaymentsPayment(payment){
+    coinPaymentsClient.getTx(payment.transactionId,(error,result)=>{
+        if(!error && result){
+            varstatus = result.status == 1 ? paymentStatus.completed
+            : result.status==0? paymentStatus.pending:paymentStatus.cancelled;
+            payment.transactionStatus = status;
+            Payment.update({ transactionId: payment.transactionId, _userId: payment._userId }, {
+                transactionStatus: status,
+                completedAt: Date.Now
+            }, function (err, affected, resp) {
+                return payment;
+            });
+        }
+        else{
+            return payment;
+        }
+    });
+}

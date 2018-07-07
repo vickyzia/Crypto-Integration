@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const cors = require('cors');
 const Token = require('./models/Token');
+var CoinPayments = require('coinpayments');
+
 
 const app = express(); // initialize express into app
 app.use(cors()); // enabling all cors

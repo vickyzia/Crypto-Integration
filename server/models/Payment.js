@@ -52,6 +52,10 @@ const PaymentSchema = new mongoose.Schema({
     amount:{
         type: Number,
         required: true
+    },
+    statusUrl:{
+        type:String,
+        default: ''
     }
 });
 
