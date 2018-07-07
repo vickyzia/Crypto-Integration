@@ -5,7 +5,7 @@ import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 import { Provider } from "react-redux";
 import store from "./store";
-
-
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import './components/Payments/payments.css'
 ReactDOM.render(<Provider store={store}><App /></Provider>, document.getElementById('root'));
 registerServiceWorker();

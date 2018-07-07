@@ -6,13 +6,13 @@ import {
     LOAD_USER_TRANSACTION_LIST,
     TRANSACTION_SENT,
     UPDATE_PAYMENT_AMOUNT,
-    LOAD_COMPLETE
+    LOAD_COMPLETE,
+    CONFIRM_TRANSACTION
 } from './types';
 import {getAccounts} from '../utils/metaMask'
 
 export const loadComplete = (paymentData) => dispatch => {
     if(window.web3){
-        console.log("Accounts:" + getAccounts());
         let netId = window.web3.version.network != undefined?  Number(window.web3.version.network):-1;
         if(netId != -1 && !paymentData){
             axios
@@ -86,11 +86,11 @@ export const sendTransaction = (transactionObject) => dispatch =>{
     axios
     .post('http://localhost:5000/api/payments/createTransaction', transactionObject)
     .then(res => {
-        
+        dispatch(loadUserTransactions());
     })
     .catch(err =>
         {
-            console.log(err);
+            console.log("transaction error: " + err);
         }
     );
 }
@@ -102,20 +102,41 @@ export const transactionSentActionCreator = () =>{
 }
 
 export const loadUserTransactions = () => dispatch =>{
-    //set isFetching flag to true
-    dispatch(loadUserTransactionsActionCreator(true,false,[]));
     axios
     .get('http://localhost:5000/api/payments/userTransactions')
     .then(res => {
-        dispatch(false,false,res);
+        dispatch(loadUserTransactionsActionCreator(false,false,res.data));
     })
     .catch(err =>
         {
-            dispatch(false,true,[]); 
+            dispatch(loadUserTransactionsActionCreator(false,true,[])); 
         }
     );
 }
 
+export const confirmTransaction = (index, transactionId) => dispatch=> {
+    dispatch(confirmTransactionActionCreator(transactionId, true));
+    axios
+    .post('http://localhost:5000/api/payments/confirmTransaction',{transactionId:transactionId})
+    .then(res => {
+        dispatch(confirmTransactionActionCreator(transactionId, false));
+        dispatch(loadUserTransactions());
+    })
+    .catch(err =>
+        {
+            dispatch(confirmTransactionActionCreator(transactionId, false));
+        }
+    );
+}
+export const confirmTransactionActionCreator = (transactionId, isUpdating)=> {
+    return {
+        type : CONFIRM_TRANSACTION,
+        payload:{
+            transactionId: transactionId,
+            isUpdating:isUpdating
+        }
+    }
+}
 export const loadUserTransactionsActionCreator = (isFetching=false,errorLoading=false,transactionList) => {
     return {
         type: LOAD_USER_TRANSACTION_LIST,

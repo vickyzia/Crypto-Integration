@@ -4,7 +4,8 @@ import {
     LOAD_USER_TRANSACTION_LIST,
     TRANSACTION_UPDATE_CURRENT,
     UPDATE_PAYMENT_AMOUNT,
-    LOAD_COMPLETE
+    LOAD_COMPLETE,
+    CONFIRM_TRANSACTION
 } from '../actions/types';
 
 const initialState = {
@@ -51,6 +52,16 @@ export default function (state = initialState, action) {
             return{
                 ...state,
                 userTransactions:action.payload.userTransactions
+            }
+        case CONFIRM_TRANSACTION:
+            return{
+                ...state,
+                userTransactions:{
+                    ...state.userTransactions,
+                    transactionList: state.userTransactions.transactionList.map(
+                        transaction => transaction.transactionId == action.payload.transactionId?
+                            {...transaction,isUpdating:action.payload.isUpdating}:transaction )
+                }
             }
         case TRANSACTION_SENT:
             return state;

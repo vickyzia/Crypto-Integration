@@ -7,7 +7,7 @@ const tokenValue = require('../config/token-value');
 const transactionMedium = require('../config/transaction-medium');
 const paymentStatus = require('../config/transaction-status');
 const coinTypes = require('../config/coin-types');
-const web3 = require('web3');
+const Web3 = require('web3');
 const router = express.Router();
 
 router.post('/createTransaction',validateToken, (req,res)=>{
@@ -25,20 +25,28 @@ router.post('/createTransaction',validateToken, (req,res)=>{
                 }
                 var newPayment;
                 if(data.transactionMedium == transactionMedium.metamask){
-                    Wallet.findOne({toAddress:data.toAddress})
+                    Wallet.findOne({publicKey:data.toAddress})
                         .then(wallet=>{
                             if(wallet){
                                 newPayment = createPaymentObject(data);
+                                newPayment.save()
+                                .then(payment=>{
+                                    return res.status(200).json(payment);
+                                })
+                                .catch(err=>{
+                                    console.log(err);
+                                    error.message = "Unable to create transaction at the moment."
+                                    return res.status(500).json(errors);
+                                });
                             }else{
                                 errors.toAddress = 'Invalid Address for payment to send to.';
                                 return res.status(400).json(errors)
                             }
-                        })
+                        });
                 }
                 else{
                     newPayment = createPaymentObject(data);
-                }
-                newPayment.save()
+                    newPayment.save()
                     .then(payment=>{
                         return res.status(200).json(payment);
                     })
@@ -46,7 +54,8 @@ router.post('/createTransaction',validateToken, (req,res)=>{
                         console.log(err);
                         error.message = "Unable to create transaction at the moment."
                         return res.status(500).json(errors);
-                    })
+                    });
+                }
             });
 });
 
@@ -64,7 +73,7 @@ function createPaymentObject(data){
     return payment;
 };
 
-router.get('/confirmTransaction',validateToken, (req,res) => {
+router.post('/confirmTransaction',validateToken, (req,res) => {
     const {errors, isValid} = paymentValidations.validateTransactionId(req.body);
     var data = req.body;
     // Check validation
@@ -83,31 +92,33 @@ router.get('/confirmTransaction',validateToken, (req,res) => {
                 payment.transactionStatus == paymentStatus.completed){
                 return res.status(200).json(payment);
             }
-            web3Http = new Web3(new Web3.providers.HttpProvider("https://ropsten.infura.io/vNqwZBGAgLsMUml2V9jp"));
-            web3Http.eth.getTransactionReciept(data.transactionId, function(error, res){
+            let web3Http = new Web3(new Web3.providers.HttpProvider("https://ropsten.infura.io/vNqwZBGAgLsMUml2V9jp"));
+            web3Http.eth.getTransactionReceipt(data.transactionId, function(error, result){
                 if(!error){
                     var status = paymentStatus.pending;
-                    if(res){
-                        status = res.status == "0x1" ? paymentStatus.completed
+                    if(result){
+                        status = result.status == "0x1" ? paymentStatus.completed
                             :paymentStatus.cancelled;
                         payment.transactionStatus = status;
                         Payment.update({transactionId:data.transactionId, _userId:data.userId},{
                             transactionStatus : status,
                             completedAt: Date.Now
                         }, function(err,affected,resp){
-                            console.log(resp);
+                            return res.status(200).json(payment);
                         });
+                    }
+                    else{
+                        return res.status(200).json(payment);
                     }
                 }
                 else{
-                    console.log(error);
+                    return res.status(200).json(payment);
                 }
-                return res.status(200).json(payment);
             })
         })
         .catch(err=>{
             console.log(err);
-            error.message = "Unable to create transaction at the moment."
+            errors.message = "Unable to confirming transaction at the moment."
             return res.status(500).json(errors);
         });
 });
@@ -115,7 +126,7 @@ router.get('/confirmTransaction',validateToken, (req,res) => {
 router.get('/userTransactions', validateToken, (req,res) => {
     var data = req.body;
     var errors = {}
-    Payment.find({_userId:data.userId}).sort({createdAt:-1}),exec((err, payments)=>{
+    Payment.find({_userId:data.userId}).sort({createdAt:-1}).exec((err, payments)=>{
         if(err)
         {
             errors.message = err;

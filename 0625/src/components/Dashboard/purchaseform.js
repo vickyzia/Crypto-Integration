@@ -1,16 +1,10 @@
 import React, { Component } from "react";
 import "./purchaseform.css";
-import isEmpty from "lodash/isEmpty"
-import ReactDOM from "react-dom";
-import { AccountUnavailable } from "../MetaMask/account-unavailable";
-import { WrongNetwork } from "../MetaMask/wrong-network";
-import { ErrorWeb3 } from "../MetaMask/error-web3";
 import "../../utils/metaMask";
-import { isWeb3Available, getAccounts, getNetworkId } from "../../utils/metaMask";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import {loadComplete, updatePayment} from "../../actions/paymentActions"
-import MetaMaskPaymentOption from "../MetaMask/metamask-payment-option"
+import MetaMaskPaymentOption from "../Payments/metamask-payment-option"
 
 
 class DashboardICO extends Component {

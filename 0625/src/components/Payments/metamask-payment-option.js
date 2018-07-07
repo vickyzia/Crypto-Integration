@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import isEmpty from "lodash/isEmpty"
 import ReactDOM from "react-dom";
-import { AccountUnavailable } from "../MetaMask/account-unavailable";
-import { WrongNetwork } from "../MetaMask/wrong-network";
-import { ErrorWeb3 } from "../MetaMask/error-web3";
+import { AccountUnavailable } from "../Payments/account-unavailable";
+import { WrongNetwork } from "../Payments/wrong-network";
+import { ErrorWeb3 } from "../Payments/error-web3";
 import "../../utils/metaMask";
 import { isWeb3Available, createTransaction } from "../../utils/metaMask";
 import { connect } from "react-redux";
@@ -13,7 +13,7 @@ import {loadComplete , updateTransactionUI, updateCurrentTransaction, sendTransa
 class MetaMaskPaymentOption extends React.Component{
     constructor(props){
         super(props);
-        this.sendTransaction = this.createTransaction.bind(this);
+        this.createTransaction = this.createTransaction.bind(this);
         this.transactionCallback = this.transactionCallback.bind(this);
     }
     componentDidMount() {
@@ -25,12 +25,13 @@ class MetaMaskPaymentOption extends React.Component{
             return ("Loading..");
         }
         if(this.props.isTransactionInProgress){
-            return ("Please complete the transaction in MetaMask to continue..");
+            return (<div>Please complete the transaction in MetaMask to continue. Note: Don't close this window.</div>);
         }
         if (!isWeb3Available()) {
             return <ErrorWeb3/>;
         }
-        else if (!this.props.networkId || this.props.networkId != 1) { 
+        else if (!this.props.networkId || this.props.networkId != 3) { 
+            console.log(this.props.networkId);
             return <WrongNetwork />;
         }
         else if (!this.props.metaMaskAccounts || isEmpty(this.props.metaMaskAccounts)) {
@@ -53,8 +54,10 @@ class MetaMaskPaymentOption extends React.Component{
         let transactionObject = {
             fromAddress :this.props.metaMaskAccounts[0],
             toAddress :  this.props.paymentData.wallets[j].publicKey,
-            paymentAmount: this.props.paymentAmount
+            amount: this.props.paymentAmount
         }
+        console.log(transactionObject);
+        console.log(this.props.paymentAmount);
         const isTranctionCreated = createTransaction(transactionObject,this.transactionCallback);
         if(isTranctionCreated){
             this.props.updateTransactionUI(true);

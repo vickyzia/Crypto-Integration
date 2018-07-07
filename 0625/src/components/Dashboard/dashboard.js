@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { logoutUser } from "../../actions/authActions";
 import PurchaseForm from "./purchaseform.js";
-
+import TransactionList from "../Payments/TransactionList"
 
 class Dashboard extends Component {
   componentDidMount() {
@@ -35,6 +35,9 @@ class Dashboard extends Component {
         </div>
         <div>
             <PurchaseForm />
+        </div>
+        <div>
+          <TransactionList />
         </div>
       </div>
     );
