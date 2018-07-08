@@ -5,11 +5,12 @@ import jwt_decode from 'jwt-decode';
 import {
     SET_CURRENT_USER, GET_ERRORS
 } from './types';
+import {BASE_URL} from '../utils/constants';
 
 // Register User
 export const registerUser = (userData, history) => dispatch => {
     axios
-        .post('http://localhost:5000/api/users/register', userData)
+        .post(BASE_URL+'/api/users/register', userData)
         .then(res => history.push('/after-register'))
         .catch(err =>
             {
@@ -26,7 +27,7 @@ export const registerUser = (userData, history) => dispatch => {
 // Login - Get User Token
 export const loginUser = userData => dispatch => {
     axios
-        .post('http://localhost:5000/api/users/login', userData)
+        .post(BASE_URL+'/api/users/login', userData)
         .then(res => {
             // Save to localStorage
             const {

@@ -1,4 +1,4 @@
 module.exports = {
-    bitcoin: 'bitcoin',
-    ether: 'ether'
+    bitcoin: 'BTC',
+    ether: 'ETH'
 };

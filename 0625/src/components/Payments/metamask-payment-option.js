@@ -31,7 +31,6 @@ class MetaMaskPaymentOption extends React.Component{
             return <ErrorWeb3/>;
         }
         else if (!this.props.networkId || this.props.networkId != 3) { 
-            console.log(this.props.networkId);
             return <WrongNetwork />;
         }
         else if (!this.props.metaMaskAccounts || isEmpty(this.props.metaMaskAccounts)) {
@@ -39,9 +38,7 @@ class MetaMaskPaymentOption extends React.Component{
         }
 
         return (          
-        <div className="pay_buttons">
             <button onClick={this.createTransaction} disabled={this.props.paymentAmount == 0 ||this.props.paymentAmount == null}>Pay with Metamask</button>
-        </div>
         );
     }
     componentWillUnmount() {
@@ -56,8 +53,6 @@ class MetaMaskPaymentOption extends React.Component{
             toAddress :  this.props.paymentData.wallets[j].publicKey,
             amount: this.props.paymentAmount
         }
-        console.log(transactionObject);
-        console.log(this.props.paymentAmount);
         const isTranctionCreated = createTransaction(transactionObject,this.transactionCallback);
         if(isTranctionCreated){
             this.props.updateTransactionUI(true);

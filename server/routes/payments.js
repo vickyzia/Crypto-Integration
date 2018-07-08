@@ -9,6 +9,8 @@ const paymentStatus = require('../config/transaction-status');
 const coinTypes = require('../config/coin-types');
 const Web3 = require('web3');
 const router = express.Router();
+const uuid = require('uuid/v4');
+const paymentConfigs = require('../config/payment-configs');
 
 var Coinpayments = require('coinpayments');
 var coinPaymentsClient = new Coinpayments({
@@ -41,7 +43,7 @@ router.post('/createTransaction',validateToken, (req,res)=>{
                                 })
                                 .catch(err=>{
                                     console.log(err);
-                                    error.message = "Unable to create transaction at the moment."
+                                    errors.message = "Unable to create transaction at the moment."
                                     return res.status(500).json(errors);
                                 });
                             }else{
@@ -58,7 +60,7 @@ router.post('/createTransaction',validateToken, (req,res)=>{
                     })
                     .catch(err=>{
                         console.log(err);
-                        error.message = "Unable to create transaction at the moment."
+                        errors.message = "Unable to create transaction at the moment."
                         return res.status(500).json(errors);
                     });
                 }
@@ -90,7 +92,7 @@ router.post('/confirmTransaction',validateToken, (req,res) => {
         .then(payment => {
             if(!payment)
             {
-                error.transactionId = "Transaction Id doesn't exist";
+                errors.transactionId = "Transaction Id doesn't exist";
                 return res.status(400).json(errors);
             }
             
@@ -100,10 +102,10 @@ router.post('/confirmTransaction',validateToken, (req,res) => {
             }
             if(payment.transactionMedium == transactionMedium.metamask)
             {
-                return res.status(200).json(confirmMetaMaskPayment(payment));
+                return confirmMetaMaskPayment(payment, res);
             }
             else{
-                return res.status(200).json(confirmCoinPaymentsPayment(payment));
+                return confirmCoinPaymentsPayment(payment,res);
             }
         })
         .catch(err=>{
@@ -149,14 +151,16 @@ router.post('/createCoinPaymentsTransaction',validateToken, (req,res)=>{
     if (!isValid) {
         return res.status(400).json(errors);
     }
+    var secretKey = uuid();
     coinPaymentsClient.createTransaction({
         amount:data.amount,
-        currency1:data.currency,
-        currency2: data.currency,
-        buyer_email: data.email
+        currency1: 'LTCT',//For Testing
+        currency2: 'LTCT',//For Testing
+        buyer_email: data.email,
+        ipn_url: paymentConfigs.IPN_CALLBACK+secretKey
     },(err,result)=>{
         if(err){
-            error.message = err;
+            errors.message = err;
             return res.status(400).json(errors);
         }
         var newPayment = new Payment({
@@ -164,9 +168,12 @@ router.post('/createCoinPaymentsTransaction',validateToken, (req,res)=>{
             paymentType: data.paymentType,
             transactionMedium : transactionMedium.coinpayments,
             tokenValue: tokenValue.getTokenValue(data.paymentType),
-            fromAddress: '', //User is yet to send payment so we can't determine the address yet.
+            fromAddress: 'N/A', //User is yet to send payment so we can't determine the address yet.
             toAddress: result.address,
-            statusUrl: result.status_url
+            statusUrl: result.status_url,
+            amount: data.amount,
+            _userId: data.userId,
+            secretKey:secretKey
         });
         newPayment.save()
             .then(payment=>{
@@ -174,16 +181,53 @@ router.post('/createCoinPaymentsTransaction',validateToken, (req,res)=>{
             })
             .catch(err=>{
                 console.log(err);
-                error.message = "Unable to create transaction at the moment."
+                errors.message = "Unable to create transaction at the moment."
                 return res.status(500).json(errors);
             });
     });
 });
 
+router.post('/transactionNotification', (req,res)=>{
+    const {errors, isValid} = paymentValidations.validateCoinPaymentsIPN(req.body);
+    var data = req.body;
+    // Check validation
+    if (!isValid) {
+        return res.status(400).json(errors);
+    }
+    var secretKey = req.query.key;
+    Payment.findOne({transactionId:data.txn_id, secretKey:secretKey})
+        .then(payment => {
+            if(!payment)
+            {
+                errors.transactionId = "Invalid Transaction ID or secret Key";
+                return res.status(400).json(errors);
+            }
+            var status = data.status == '100' || data.status == '1'? paymentStatus.completed
+            : data.status == '0'? paymentStatus.pending:paymentStatus.cancelled;
+            payment.transactionStatus = status;
+            payment.transactionFee = data.fee;
+            if(payment.transactionStatus == paymentStatus.completed)
+                payment.completedAt = Date.Now;
+            Payment.update({ transactionId: payment.transactionId, _userId: payment._userId }, {
+                transactionStatus: status,
+                completedAt: payment.completedAt,
+                transactionFee : payment.transactionFee
+            }, function (err, affected, resp) {
+                return res.status(200).json("Received");
+            });
+            
+        })
+        .catch(err=>{
+            console.log(err);
+            errors.message = "Unable to confirming transaction at the moment."
+            return res.status(500).json(errors);
+        });
+});
+
 module.exports = router;
 
-function confirmMetaMaskPayment(payment) {
-    let web3Http = new Web3(new Web3.providers.HttpProvider("https://ropsten.infura.io/vNqwZBGAgLsMUml2V9jp"));
+function confirmMetaMaskPayment(payment,res) {
+    let web3Http = new Web3(new Web3.providers.HttpProvider(paymentConfigs.ETHEREUM_NETWORK));
     web3Http.eth.getTransactionReceipt(payment.transactionId, function (error, result) {
         if (!error && result) {
             var status = paymentStatus.pending;
@@ -194,30 +238,30 @@ function confirmMetaMaskPayment(payment) {
                 transactionStatus: status,
                 completedAt: Date.Now
             }, function (err, affected, resp) {
-                return payment;
+                return res.status(200).json(payment);
             });
         }
         else {
-            return payment;
+            return res.status(200).json(payment);
         }
     });
 }
 
-function confirmCoinPaymentsPayment(payment){
+function confirmCoinPaymentsPayment(payment,res){
     coinPaymentsClient.getTx(payment.transactionId,(error,result)=>{
         if(!error && result){
-            varstatus = result.status == 1 ? paymentStatus.completed
+            var status = result.status == 1 || result.status == 100? paymentStatus.completed
             : result.status==0? paymentStatus.pending:paymentStatus.cancelled;
             payment.transactionStatus = status;
             Payment.update({ transactionId: payment.transactionId, _userId: payment._userId }, {
                 transactionStatus: status,
                 completedAt: Date.Now
             }, function (err, affected, resp) {
-                return payment;
+                return res.status(200).json(payment);
             });
         }
         else{
-            return payment;
+            return res.status(200).json(payment);
         }
     });
 }

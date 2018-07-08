@@ -1,6 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://127.0.0.1:27017/referral');
+mongoose.connect('mongodb://root:root123@ds229771.mlab.com:29771/vz-payments');
 const bodyParser = require('body-parser');
 const passport = require('passport');
 const cors = require('cors');

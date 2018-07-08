@@ -5,9 +5,12 @@ import {
     TRANSACTION_UPDATE_CURRENT,
     UPDATE_PAYMENT_AMOUNT,
     LOAD_COMPLETE,
-    CONFIRM_TRANSACTION
+    CONFIRM_TRANSACTION,
+    CHANGE_COIN_TYPE,
+    CP_PAYMENT_TRANSACTION_STATUS,
+    CREATE_CP_PAYMENT_TRANSACTION
 } from '../actions/types';
-
+import {ETH,BTC} from '../utils/constants'
 const initialState = {
     isLoading: true,
     networkId: -1,
@@ -20,7 +23,10 @@ const initialState = {
         isFetching:false,
         errorLoading:false,
         transactionList:[]
-    }
+    },
+    coinType:ETH,
+    isCPTransactionInProgress: false,
+    CPTransactionStatus :0
 };
 
 export default function (state = initialState, action) {
@@ -63,6 +69,21 @@ export default function (state = initialState, action) {
                             {...transaction,isUpdating:action.payload.isUpdating}:transaction )
                 }
             }
+        case CHANGE_COIN_TYPE:
+            return{
+                ...state,
+                coinType: action.payload.coinType
+        }
+        case CREATE_CP_PAYMENT_TRANSACTION:
+            return{
+                ...state,
+                isCPTransactionInProgress: action.payload.isCPTransactionInProgress
+        }
+        case CP_PAYMENT_TRANSACTION_STATUS:
+            return{
+                ...state,
+                CPTransactionStatus: action.payload.CPTransactionStatus
+        }
         case TRANSACTION_SENT:
             return state;
         default:

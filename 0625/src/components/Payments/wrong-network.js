@@ -9,7 +9,7 @@ const getText = (neededNetwork) => (
 );
 
 const WrongNetwork = () => {
-  const network = resolveNetwork('1');
+  const network = resolveNetwork('3');
   return (
     <div className="text-center">
       {

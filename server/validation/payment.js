@@ -58,9 +58,9 @@ module.exports ={
     getCurrentEthNetwork : function(){
         
     },
-    validateCoinPaymentsTransactionInput = (data)=>{
+    validateCoinPaymentsTransactionInput : data => {
         data.amount = !isEmpty(data.amount) ? data.amount: 0;
-        data.paymentType = !isEmpty(data.currency) ? data.paymentType : '';
+        data.paymentType = !isEmpty(data.paymentType) ? data.paymentType : '';
         let errors = {};
 
         if(!Validator.equals(data.paymentType, paymentType.bitcoin) &&
@@ -69,6 +69,25 @@ module.exports ={
         }
         if(data.amount <= 0){
             errors.amount = "amount should be greater than 0";
+        }
+        return {
+            errors,
+            isValid: isEmpty(errors)
+        };
+    },
+    validateCoinPaymentsIPN : data=>{
+        data.txn_id = !isEmpty(data.txn_id) ? data.txn_id: '';
+        data.status = !isEmpty(data.status) ? data.status : '';
+        data.buyer_name = !isEmpty(data.buyer_name) ? data.buyer_name : '';
+        data.fee = !isEmpty(data.fee) ? Number(data.fee) : 0;
+
+        let errors = {};
+
+        if(Validator.isEmpty(data.status)){
+            errors.status = "Status cannot be empty";
+        }
+        if(Validator.isEmpty(data.txn_id)){
+            errors.status = "Status cannot be empty";
         }
         return {
             errors,

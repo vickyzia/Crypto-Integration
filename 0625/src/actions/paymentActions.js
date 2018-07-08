@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import {BASE_URL} from '../utils/constants';
 import {
     TRANSACTION_UPDATE_UI,
     TRANSACTION_UPDATE_CURRENT,
@@ -7,7 +7,11 @@ import {
     TRANSACTION_SENT,
     UPDATE_PAYMENT_AMOUNT,
     LOAD_COMPLETE,
-    CONFIRM_TRANSACTION
+    CONFIRM_TRANSACTION,
+    CHANGE_COIN_TYPE,
+    CREATE_CP_PAYMENT_TRANSACTION,
+    CP_PAYMENT_TRANSACTION_STATUS,
+    OPEN_NEW_WINDOW
 } from './types';
 import {getAccounts} from '../utils/metaMask'
 
@@ -16,7 +20,7 @@ export const loadComplete = (paymentData) => dispatch => {
         let netId = window.web3.version.network != undefined?  Number(window.web3.version.network):-1;
         if(netId != -1 && !paymentData){
             axios
-            .get('http://localhost:5000/api/payments/loadPaymentData')
+            .get(BASE_URL+'/api/payments/loadPaymentData')
             .then(res => {
                 dispatch(loadCompleteActionCreator(netId,res.data,getAccounts()));
             })
@@ -84,7 +88,7 @@ export const transactionCurrentUpdateActionCreator = (currentTransaction) =>{
 
 export const sendTransaction = (transactionObject) => dispatch =>{
     axios
-    .post('http://localhost:5000/api/payments/createTransaction', transactionObject)
+    .post(BASE_URL+'/api/payments/createTransaction', transactionObject)
     .then(res => {
         dispatch(loadUserTransactions());
     })
@@ -103,7 +107,7 @@ export const transactionSentActionCreator = () =>{
 
 export const loadUserTransactions = () => dispatch =>{
     axios
-    .get('http://localhost:5000/api/payments/userTransactions')
+    .get(BASE_URL+'/api/payments/userTransactions')
     .then(res => {
         dispatch(loadUserTransactionsActionCreator(false,false,res.data));
     })
@@ -117,7 +121,7 @@ export const loadUserTransactions = () => dispatch =>{
 export const confirmTransaction = (index, transactionId) => dispatch=> {
     dispatch(confirmTransactionActionCreator(transactionId, true));
     axios
-    .post('http://localhost:5000/api/payments/confirmTransaction',{transactionId:transactionId})
+    .post(BASE_URL+'/api/payments/confirmTransaction',{transactionId:transactionId})
     .then(res => {
         dispatch(confirmTransactionActionCreator(transactionId, false));
         dispatch(loadUserTransactions());
@@ -148,5 +152,52 @@ export const loadUserTransactionsActionCreator = (isFetching=false,errorLoading=
             }
         }
     };
+}
+
+export const changeCoinType = (coinType) => dispatch => {
+    dispatch(changeCoinTypeActionCreator(coinType));
+}
+export const changeCoinTypeActionCreator = (coinType) => {
+    return {
+        type: CHANGE_COIN_TYPE,
+        payload:{
+            coinType: coinType
+        }
+    };
+}
+export const createCPTransaction = (transactionObject) => dispatch =>{
+    dispatch(createCPTransactionActionCreator(true));
+    axios
+    .post(BASE_URL+'/api/payments/createCoinPaymentsTransaction', transactionObject)
+    .then(res => {
+        window.open(res.data.statusUrl,'_blank');
+        dispatch(createCPTransactionActionCreator(false));
+        dispatch(CPTransactionStatusActionCreator(1));
+        dispatch(loadUserTransactions());
+    })
+    .catch(err =>
+        {
+            dispatch(createCPTransactionActionCreator(false));
+            dispatch(CPTransactionStatusActionCreator(2));
+            console.log("transaction error: " + err);
+        }
+    );
+}
+
+export const createCPTransactionActionCreator = (isCPTransactionInProgress) =>{
+    return{
+        type: CREATE_CP_PAYMENT_TRANSACTION,
+        payload:{
+            isCPTransactionInProgress: isCPTransactionInProgress
+        }
+    }
+}
+export const CPTransactionStatusActionCreator = (CPTransactionStatus) =>{
+    return{
+        type: CP_PAYMENT_TRANSACTION_STATUS,
+        payload:{
+            CPTransactionStatus: CPTransactionStatus
+        }
+    }
 }
 

@@ -53,9 +53,18 @@ const PaymentSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    //For CoinPayments
     statusUrl:{
         type:String,
         default: ''
+    },
+    secretKey:{
+        type:String,
+        default:''
+    },
+    transactionFee:{
+        type: Number,
+        default: 0
     }
 });
 
