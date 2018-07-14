@@ -9,6 +9,7 @@ import { isWeb3Available, createTransaction } from "../../utils/metaMask";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import {loadComplete , updateTransactionUI, updateCurrentTransaction, sendTransaction} from "../../actions/paymentActions"
+import {METAMASK_NETWORK_REQUIRED} from '../../utils/constants'
 
 class MetaMaskPaymentOption extends React.Component{
     constructor(props){
@@ -30,7 +31,7 @@ class MetaMaskPaymentOption extends React.Component{
         if (!isWeb3Available()) {
             return <ErrorWeb3/>;
         }
-        else if (!this.props.networkId || this.props.networkId != 3) { 
+        else if (!this.props.networkId || this.props.networkId != METAMASK_NETWORK_REQUIRED) { 
             return <WrongNetwork />;
         }
         else if (!this.props.metaMaskAccounts || isEmpty(this.props.metaMaskAccounts)) {

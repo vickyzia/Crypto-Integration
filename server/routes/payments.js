@@ -154,8 +154,8 @@ router.post('/createCoinPaymentsTransaction',validateToken, (req,res)=>{
     var secretKey = uuid();
     coinPaymentsClient.createTransaction({
         amount:data.amount,
-        currency1: 'LTCT',//For Testing
-        currency2: 'LTCT',//For Testing
+        currency1: 'LTCT',//For Testing use data.paymentType for production
+        currency2: 'LTCT',//For Testing use data.paymentType for production
         buyer_email: data.email,
         ipn_url: paymentConfigs.IPN_CALLBACK+secretKey
     },(err,result)=>{

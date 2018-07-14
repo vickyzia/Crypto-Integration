@@ -49,6 +49,7 @@ class LoginForm extends Component {
     this.props.loginUser(userData);
   }
   render() {
+    console.log(this.state);
     const { errors } = this.state;
     return (
       <div className="login_form">
@@ -99,7 +100,7 @@ class LoginForm extends Component {
 
 const mapStateToProps = state => ({
   auth: state.auth,
-  errors: state.errors
+  errors: state.errors.error
 });
 
 export default connect(
