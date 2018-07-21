@@ -41,6 +41,14 @@ const PaymentSchema = new mongoose.Schema({
         type: Number,
         default: 1.0
     },
+    tokens:{
+        type: Number,
+        default: 0
+    },
+    bonusTokens:{
+        type:Number,
+        default:0
+    },
     fromAddress:{
         type: String,
         required:true
@@ -65,6 +73,10 @@ const PaymentSchema = new mongoose.Schema({
     transactionFee:{
         type: Number,
         default: 0
+    },
+    isProcessed:{
+        type: Boolean,
+        default: false
     }
 });
 

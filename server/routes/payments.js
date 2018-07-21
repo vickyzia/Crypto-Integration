@@ -32,38 +32,25 @@ router.post('/createTransaction',validateToken, (req,res)=>{
                     return res.status(400).json(errors)
                 }
                 var newPayment;
-                if(data.transactionMedium == transactionMedium.metamask){
-                    Wallet.findOne({publicKey:data.toAddress})
-                        .then(wallet=>{
-                            if(wallet){
-                                newPayment = createPaymentObject(data);
-                                newPayment.save()
-                                .then(payment=>{
-                                    return res.status(200).json(payment);
-                                })
-                                .catch(err=>{
-                                    console.log(err);
-                                    errors.message = "Unable to create transaction at the moment."
-                                    return res.status(500).json(errors);
-                                });
-                            }else{
-                                errors.toAddress = 'Invalid Address for payment to send to.';
-                                return res.status(400).json(errors)
-                            }
-                        });
-                }
-                else{
-                    newPayment = createPaymentObject(data);
-                    newPayment.save()
-                    .then(payment=>{
-                        return res.status(200).json(payment);
-                    })
-                    .catch(err=>{
-                        console.log(err);
-                        errors.message = "Unable to create transaction at the moment."
-                        return res.status(500).json(errors);
+                Wallet.findOne({publicKey:data.toAddress})
+                    .then(wallet=>{
+                        if(wallet){
+                            newPayment = createPaymentObject(data);
+                            newPayment.save()
+                            .then(payment=>{
+                                return res.status(200).json(payment);
+                            })
+                            .catch(err=>{
+                                console.log(err);
+                                errors.message = "Unable to create transaction at the moment."
+                                return res.status(500).json(errors);
+                            });
+                        }else{
+                            errors.toAddress = 'Invalid Address for payment to send to.';
+                            return res.status(400).json(errors)
+                        }
                     });
-                }
+                
             });
 });
 
@@ -76,7 +63,9 @@ function createPaymentObject(data){
         fromAddress : data.fromAddress,
         toAddress : data.toAddress,
         transactionMedium: data.transactionMedium,
-        tokenValue : tokenValue.getTokenValue(data.paymentType)
+        tokenValue : tokenValue.getETHTokenValue(),
+        tokens: tokenValue.getETHTokenValue() * amount,
+        bonusTokens: tokenValue.getBonusTokens(amount)
     })
     return payment;
 };
@@ -129,62 +118,83 @@ router.get('/userTransactions', validateToken, (req,res) => {
 });
 
 //Load Token Value in BTC and Ether as well as Wallet Address list to work with MetaMask
-router.get('/loadPaymentData',validateToken, (req,res)=>{
-    var payload = {};
+router.get('/loadPaymentData',validateToken, async (req,res)=>{
     var errors = {};
-    payload.BtcTokenValue = tokenValue.getTokenValue(coinTypes.bitcoin);
-    payload.EtherTokenValue = tokenValue.getTokenValue(coinTypes.ether);
-    Wallet.find({},'publicKey',function(err,wallets){
-        if(err){
-            errors.message = err;
-            return res.status(500).json(errors);
-        }
-        payload.wallets = wallets;
-        return res.status(200).json(payload);
-    })
+    try{
+        var payload = {};
+        payload.BtcTokenValue = await tokenValue.getBTCTokenValue();
+        payload.EtherTokenValue = tokenValue.getETHTokenValue();
+        Wallet.find({},'publicKey',function(err,wallets){
+            if(err){
+                errors.message = err;
+                return res.status(500).json(errors);
+            }
+            payload.wallets = wallets;
+            return res.status(200).json(payload);
+        });
+    }
+    catch(err){
+        errors.message = err;
+        return res.status(500).json(errors);
+    }
 });
 
-router.post('/createCoinPaymentsTransaction',validateToken, (req,res)=>{
+router.post('/createCoinPaymentsTransaction',validateToken, async (req,res)=>{
     const {errors, isValid} = paymentValidations.validateCoinPaymentsTransactionInput(req.body);
-    var data = req.body;
-    // Check validation
-    if (!isValid) {
-        return res.status(400).json(errors);
-    }
-    var secretKey = uuid();
-    coinPaymentsClient.createTransaction({
-        amount:data.amount,
-        currency1: 'LTCT',//For Testing use data.paymentType for production
-        currency2: 'LTCT',//For Testing use data.paymentType for production
-        buyer_email: data.email,
-        ipn_url: paymentConfigs.IPN_CALLBACK+secretKey
-    },(err,result)=>{
-        if(err){
-            errors.message = err;
+    try{
+        var data = req.body;
+        // Check validation
+        if (!isValid) {
             return res.status(400).json(errors);
         }
-        var newPayment = new Payment({
-            transactionId: result.txn_id,
-            paymentType: data.paymentType,
-            transactionMedium : transactionMedium.coinpayments,
-            tokenValue: tokenValue.getTokenValue(data.paymentType),
-            fromAddress: 'N/A', //User is yet to send payment so we can't determine the address yet.
-            toAddress: result.address,
-            statusUrl: result.status_url,
-            amount: data.amount,
-            _userId: data.userId,
-            secretKey:secretKey
-        });
-        newPayment.save()
-            .then(payment=>{
-                return res.status(200).json(payment);
-            })
-            .catch(err=>{
-                console.log(err);
-                errors.message = "Unable to create transaction at the moment."
-                return res.status(500).json(errors);
+        var secretKey = uuid();
+        coinPaymentsClient.createTransaction({
+            amount:data.amount,
+            currency1: 'LTCT',//For Testing use data.paymentType for production
+            currency2: 'LTCT',//For Testing use data.paymentType for production
+            buyer_email: data.email,
+            ipn_url: paymentConfigs.IPN_CALLBACK+secretKey
+        }, async (err,result)=>{
+            if(err){
+                errors.message = err;
+                return res.status(400).json(errors);
+            }
+            let tokenVal = data.paymentType==coinTypes.ether?tokenValue.getETHTokenValue():
+            await tokenValue.getBTCTokenValue();
+            var newPayment = new Payment({
+                transactionId: result.txn_id,
+                paymentType: data.paymentType,
+                transactionMedium : transactionMedium.coinpayments,
+                tokenValue: tokenVal,
+                fromAddress: 'N/A', //User is yet to send payment so we can't determine the address yet.
+                toAddress: result.address,
+                statusUrl: result.status_url,
+                amount: data.amount,
+                _userId: data.userId,
+                secretKey:secretKey,
+                tokens: data.amount * tokenVal,
+                bonusTokens: data.paymentType==coinTypes.ether?tokenValue.getBonusTokens(data.amount):
+                tokenValue.getBonusTokens((data.amount * tokenVal)/tokenValue.getETHTokenValue())
             });
-    });
+            if(newPayment.tokenValue == 0){
+                errors.message = "Unable to fetch BTC coin value";
+                return res.status(400).json(errors);
+            }
+            newPayment.save()
+                .then(payment=>{
+                    return res.status(200).json(payment);
+                })
+                .catch(err=>{
+                    console.log(err);
+                    errors.message = "Unable to create transaction at the moment."
+                    return res.status(500).json(errors);
+                });
+        });
+    }
+    catch(err){
+        errors.message = err;
+        return res.status(500).json(errors);
+    }
 });
 
 router.post('/transactionNotification', (req,res)=>{
@@ -265,3 +275,5 @@ function confirmCoinPaymentsPayment(payment,res){
         }
     });
 }
+
+

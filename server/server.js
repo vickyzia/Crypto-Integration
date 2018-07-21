@@ -1,12 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://root:root123@ds229771.mlab.com:29771/vz-payments');
+mongoose.set('debug', true);
+// mongoose.connect('mongodb://root:root123@ds229771.mlab.com:29771/vz-payments');
+mongoose.connect('mongodb://127.0.0.1:27017/referral');
 const bodyParser = require('body-parser');
 const passport = require('passport');
 const cors = require('cors');
-const Token = require('./models/Token');
-var CoinPayments = require('coinpayments');
-
+var schedule = require('node-schedule');
+var {processPayments} = require('./utilities/payments-process');
 
 const app = express(); // initialize express into app
 app.use(cors()); // enabling all cors
@@ -40,6 +41,14 @@ app.use('/api/payments', payments);
 const port = process.env.PORT || 5000;
 
 app.get('/', (req, res) => res.send('hello'));
+
+var rule = new schedule.RecurrenceRule();
+rule.hour = 12;
+rule.minute = 0;
+//Run scheduler
+var j = schedule.scheduleJob(rule, function(){
+    processPayments();
+});
 
 app.listen(port, () => {
     console.log(`Server running on ${port}`)

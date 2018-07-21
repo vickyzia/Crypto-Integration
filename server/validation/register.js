@@ -9,6 +9,12 @@ module.exports = validateRegisterInput = data => {
     data.regpassword = !isEmpty(data.password) ? data.password : '';
     data.regpassword2 = !isEmpty(data.password2) ? data.password2 : '';
 
+    // Added
+
+    data.sponsor = !isEmpty(data.sponsor) ? data.sponsor : '';
+
+    // End
+
     if (!Validator.isEmail(data.regemail)) {
         errors.regemail = 'Email is invalid';
     }

@@ -12,9 +12,29 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
+    refcode: {
+        type: String,
+        required: true,
+        default: ''
+    },
+    sponsor: {
+        type: String
+    },
+    hftBal: {
+        type: Schema.Types.Decimal128,
+        default: 0
+    },
+    hftBlockchainSent: {
+        type: Schema.Types.Decimal128,
+        default: 0
+    },
+    ETH: {
+        type: String,
+        default: ""
+    },
     date: {
         type: Date,
-        default: Date.now,
+        default: Date.now
     },
     isVerified: { 
         type: Boolean,

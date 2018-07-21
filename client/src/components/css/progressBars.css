@@ -1,0 +1,149 @@
+.loadingBarContainer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+}
+.loadingBar {
+  border: 1px solid transparent;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.loadingBarText {
+  text-align: right;
+  padding-right: 10px;
+  white-space: nowrap;
+}
+
+.loadingBarBar {
+  text-align: left;
+}
+
+.loadingBarStatus {
+  text-align: left;
+  padding-left: 10px;
+}
+
+.loadingBar_progress_completed {
+  height: 12px;
+  background-color: rgba(25, 59, 87, 0.8);
+  width: 100%;
+}
+
+.loadingBar_border_completed {
+  border: transparent;
+  box-shadow: 0 0 4px #444;
+}
+
+.loadingBar_progress_active {
+  background: #00ffff;
+  animation: bgcolorchange 2s;
+  -moz-animation: bgcolorchange 2s infinite; /* Firefox */
+  -webkit-animation: bgcolorchange 2s infinite; /* Safari and Chrome */
+  height: 12px;
+  width: 75%; /*changes based on progress*/
+}
+.loadingBar_border_active {
+  border: transparent;
+  box-shadow: 0 0 4px #00ffff;
+}
+
+.loadingBar_progress_inactive {
+  height: 12px;
+  width: 0%;
+}
+.loadingBar_border_inactive {
+  border: transparent;
+  box-shadow: 0 0 4px #444;
+}
+
+.loadingBar_button {
+  width: 100px;
+  height: 20px;
+}
+
+@-moz-keyframes bgcolorchange /* Firefox */ {
+  0% {
+    background: rgba(0, 255, 255, 1);
+  }
+  50% {
+    background: rgba(0, 255, 255, 0.2);
+  }
+  100% {
+    background: rgba(0, 255, 255, 1);
+  }
+}
+
+@-webkit-keyframes bgcolorchange /* Safari and Chrome */ {
+  0% {
+    background: rgba(0, 255, 255, 1);
+  }
+  50% {
+    background: rgba(0, 255, 255, 0.2);
+  }
+  100% {
+    background: rgba(0, 255, 255, 1);
+  }
+}
+
+
+
+
+/* Media Responsiveness */
+
+
+@media only screen and (max-width: 767px) {
+  .loadingBarBar {
+    width: 160px;
+  }
+  .loadingBarContainer{
+    font-size: 14px;
+  }
+  .loadingBarStatus,
+  .loadingBarText{
+    width: 90px;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .loadingBarBar {
+    width: 200px;
+  }
+  .loadingBarContainer{
+    font-size: 16px;
+  }
+  .loadingBarStatus,
+  .loadingBarText{
+    width: 90px;
+  }
+}
+
+@media only screen and (min-width: 980px) {
+  .loadingBarBar {
+    width: 200px;
+  }
+  .loadingBarContainer{
+    font-size: 18px;
+  }
+  .loadingBarStatus,
+  .loadingBarText{
+    width: 90px;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .loadingBarBar {
+    width: 280px;
+  }
+  .loadingBarContainer{
+    font-size: 18px;
+  }
+  .loadingBarStatus,
+  .loadingBarText{
+    width: 120px;
+  }
+}

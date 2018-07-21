@@ -1,0 +1,250 @@
+.dbdb_container {
+  background-color: white;
+  border: 1px solid #ccc;
+  color: rgb(31, 30, 10);
+  display: flex;
+  flex-flow: row wrap;
+  padding: 25px;
+  justify-content: space-evenly;
+}
+
+.dbdb_divider,
+ .dbdb_divider2{
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.dbdb_divider2 {
+  margin-top: 15px;
+}
+
+.dbdb_section1,
+.dbdb_section2,
+.dbdb_section3 {
+  display: flex;
+  flex-flow: column wrap;
+}
+
+.dbdb_section1_content {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.dbdb_card_title {
+  text-align: center;
+  padding-top: 5px;
+  padding-bottom: 15px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #888;
+  font-weight: 700;
+}
+
+.dbdb_card_title2 {
+  font-size: 14px;
+  text-align: center;
+  padding-top: 2px;
+  padding-bottom: 8px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #888;
+}
+
+.dbdb_section1_content_part1,
+.dbdb_section1_content_part2,
+.dbdb_section1_content_part3 {
+  border: 1px solid transparent;
+  box-shadow: 0px 0px 2px rgba(48, 144, 199, 1);
+  background-color: #F0F8FF;
+  margin: 10px;
+  padding: 10px;
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.dbdb_ref_card {
+  border: 1px solid #888;
+  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5);
+  margin: 10px;
+  padding: 10px;
+  display: flex;
+  flex-flow: column nowrap;
+  width: 150px;
+  height: 70px;
+}
+
+.dbdb_section2_content,
+.dbdb_section3_content {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.dbdb_section3_content {
+  flex-flow: column nowrap;
+}
+
+.dbdb_section2_content {
+  flex-flow: row wrap;
+  border: 1px solid #888;
+  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5);
+  padding: 20px;
+}
+
+.dbdb_construction_text {
+  font-size: 24px;
+  font-weight: 700;
+  padding: 20px;
+  white-space: nowrap;
+}
+
+.dbdb_construction_img {
+  max-height: 80px;
+  max-width: 80px;
+  height: auto;
+  width: auto;
+}
+
+.dbdb_flex_row {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.dbdb_card_left {
+  text-align: right;
+  width: 105px;
+  padding: 5px 10px 5px 0px;
+}
+
+.dbdb_card_right {
+  text-align: left;
+  padding: 5px 0px;
+  width: 85px;
+}
+
+.dbdb_card_left2 {
+  text-align: right;
+  width: 130px;
+  padding: 5px 10px 5px 0px;
+}
+
+.dbdb_card_right2 {
+  text-align: left;
+  padding: 5px 0px;
+  width: 60px;
+}
+
+.dbdb_card_left3 {
+  text-align: right;
+  width: 300px;
+  padding: 5px 10px 5px 0px;
+}
+
+.dbdb_card_right3 {
+  text-align: left;
+  padding: 5px 0px;
+  width: 200px;
+}
+
+.dbdb_card_button_container {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.dbdb_card_disclaimer {
+  margin-top: 20px;
+  padding: 5px;
+  color: #333;
+  text-align: center;
+}
+
+.dbdb_card_buttons {
+  transition: 0.3s;
+  margin-bottom: 5px;
+  background-color: #C2DFFF;
+  border: 1px solid #B4CFEC;
+  padding: 5px 0px;
+  white-space: nowrap;
+}
+
+.dbdb_card_buttons:hover {
+  background-color: #ADDFFF;
+}
+
+.dbdb_bold {
+  font-weight: 700;
+}
+
+/* Media Responsiveness */
+
+@media only screen and (max-width: 767px) {
+  .dbdb_card_title {
+    font-size: 14px;
+  }
+  .dbdb_divider,
+  .dbdb_divider2 {
+    font-size: 18px;
+  }
+  .dbdb_flex_row {
+    font-size: 14px;
+  }
+  .dbdb_card_buttons {
+    width: 150px;
+    font-size: 14px;
+  }
+  .dbdb_section1_content_part1,
+.dbdb_section1_content_part2,
+.dbdb_section1_content_part3{
+  width: 200px;
+}
+}
+
+@media only screen and (min-width: 768px) {
+  .dbdb_card_title {
+    font-size: 14px;
+  }
+  .dbdb_divider,
+  .dbdb_divider2 {
+    font-size: 18px;
+  }
+  .dbdb_flex_row {
+    font-size: 12px;
+  }
+  .dbdb_card_buttons {
+    width: 140px;
+    font-size: 12px;
+  }
+  .dbdb_section1_content_part1,
+  .dbdb_section1_content_part2,
+  .dbdb_section1_content_part3{
+    width: 180px;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .dbdb_card_title {
+    font-size: 18px;
+  }
+  .dbdb_divider,
+  .dbdb_divider2 {
+    font-size: 24px;
+  }
+  .dbdb_flex_row {
+    font-size: 14px;
+  }
+  .dbdb_card_buttons {
+    width: 160px;
+    font-size: 14px;
+  }
+  .dbdb_section1_content_part1,
+  .dbdb_section1_content_part2,
+  .dbdb_section1_content_part3{
+    width: 240px;
+  }
+}
