@@ -7,10 +7,10 @@ const tokenValue = require('../config/token-value');
 const transactionMedium = require('../config/transaction-medium');
 const paymentStatus = require('../config/transaction-status');
 const coinTypes = require('../config/coin-types');
-const Web3 = require('web3');
 const router = express.Router();
 const uuid = require('uuid/v4');
 const paymentConfigs = require('../config/payment-configs');
+const {confirmTransaction} = require('../utilities/payments-process'); 
 
 var Coinpayments = require('coinpayments');
 var coinPaymentsClient = new Coinpayments({
@@ -64,8 +64,8 @@ function createPaymentObject(data){
         toAddress : data.toAddress,
         transactionMedium: data.transactionMedium,
         tokenValue : tokenValue.getETHTokenValue(),
-        tokens: tokenValue.getETHTokenValue() * amount,
-        bonusTokens: tokenValue.getBonusTokens(amount)
+        tokens: tokenValue.getETHTokenValue() * data.amount,
+        bonusTokens: tokenValue.getBonusTokens(data.amount)
     })
     return payment;
 };
@@ -78,7 +78,7 @@ router.post('/confirmTransaction',validateToken, (req,res) => {
         return res.status(400).json(errors);
     }
     Payment.findOne({transactionId:data.transactionId, _userId:data.userId})
-        .then(payment => {
+        .then(async payment => {
             if(!payment)
             {
                 errors.transactionId = "Transaction Id doesn't exist";
@@ -89,13 +89,8 @@ router.post('/confirmTransaction',validateToken, (req,res) => {
                 payment.transactionStatus == paymentStatus.completed){
                 return res.status(200).json(payment);
             }
-            if(payment.transactionMedium == transactionMedium.metamask)
-            {
-                return confirmMetaMaskPayment(payment, res);
-            }
-            else{
-                return confirmCoinPaymentsPayment(payment,res);
-            }
+            let returnPayment = await confirmTransaction(payment);
+            return res.status(200).json(returnPayment);
         })
         .catch(err=>{
             console.log(err);
@@ -159,7 +154,7 @@ router.post('/createCoinPaymentsTransaction',validateToken, async (req,res)=>{
                 errors.message = err;
                 return res.status(400).json(errors);
             }
-            let tokenVal = data.paymentType==coinTypes.ether?tokenValue.getETHTokenValue():
+            var tokenVal = data.paymentType==coinTypes.ether?tokenValue.getETHTokenValue():
             await tokenValue.getBTCTokenValue();
             var newPayment = new Payment({
                 transactionId: result.txn_id,
@@ -173,7 +168,7 @@ router.post('/createCoinPaymentsTransaction',validateToken, async (req,res)=>{
                 _userId: data.userId,
                 secretKey:secretKey,
                 tokens: data.amount * tokenVal,
-                bonusTokens: data.paymentType==coinTypes.ether?tokenValue.getBonusTokens(data.amount):
+                bonusTokens: data.paymentType==coinTypes.ether?tokenValue.getBonusTokens(data.amount) :
                 tokenValue.getBonusTokens((data.amount * tokenVal)/tokenValue.getETHTokenValue())
             });
             if(newPayment.tokenValue == 0){
@@ -235,45 +230,5 @@ router.post('/transactionNotification', (req,res)=>{
 });
 
 module.exports = router;
-
-function confirmMetaMaskPayment(payment,res) {
-    let web3Http = new Web3(new Web3.providers.HttpProvider(paymentConfigs.ETHEREUM_NETWORK));
-    web3Http.eth.getTransactionReceipt(payment.transactionId, function (error, result) {
-        if (!error && result) {
-            var status = paymentStatus.pending;
-            status = result.status == "0x1" ? paymentStatus.completed
-                : paymentStatus.cancelled;
-            payment.transactionStatus = status;
-            Payment.update({ transactionId: payment.transactionId, _userId: payment._userId }, {
-                transactionStatus: status,
-                completedAt: Date.Now
-            }, function (err, affected, resp) {
-                return res.status(200).json(payment);
-            });
-        }
-        else {
-            return res.status(200).json(payment);
-        }
-    });
-}
-
-function confirmCoinPaymentsPayment(payment,res){
-    coinPaymentsClient.getTx(payment.transactionId,(error,result)=>{
-        if(!error && result){
-            var status = result.status == 1 || result.status == 100? paymentStatus.completed
-            : result.status==0? paymentStatus.pending:paymentStatus.cancelled;
-            payment.transactionStatus = status;
-            Payment.update({ transactionId: payment.transactionId, _userId: payment._userId }, {
-                transactionStatus: status,
-                completedAt: Date.Now
-            }, function (err, affected, resp) {
-                return res.status(200).json(payment);
-            });
-        }
-        else{
-            return res.status(200).json(payment);
-        }
-    });
-}
 
 

@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const cors = require('cors');
 var schedule = require('node-schedule');
-var {processPayments} = require('./utilities/payments-process');
+var {processPayments, confirmTransactions} = require('./utilities/payments-process');
 
 const app = express(); // initialize express into app
 app.use(cors()); // enabling all cors
@@ -43,13 +43,14 @@ const port = process.env.PORT || 5000;
 app.get('/', (req, res) => res.send('hello'));
 
 var rule = new schedule.RecurrenceRule();
-rule.hour = 12;
-rule.minute = 0;
+rule.hour = 0;
+rule.minute = 1;
 //Run scheduler
-var j = schedule.scheduleJob(rule, function(){
+var j = schedule.scheduleJob("*/1 * * * *", async function(){
+    await confirmTransactions();
     processPayments();
 });
 
 app.listen(port, () => {
-    console.log(`Server running on ${port}`)
+    console.log(`Server running on ${port}`);
 });

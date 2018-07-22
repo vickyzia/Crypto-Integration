@@ -11,27 +11,31 @@ module.exports = {
     getETHTokenValue(){
             return 4000;
     },
-    getBTCTokenValue(){
-        coinPaymentsClient.rates({short:1}, function(err,result){
-            let BtcTokenValue = 0;
-            if(err){
-                axios
-                .get(CONVERSION_URL)
-                .then(res => {
-                    return res.data.BTC.ETH *4000;
-                })
-                .catch(err =>
-                {
-                    return BtcTokenValue; 
-                });
-            }
-            else{
-                BtcTokenValue = (1/result.ETH.rate_btc) * 4000;
-                return BtcTokenValue;
-            }
+    async getBTCTokenValue(){
+
+        return new Promise((resolve,reject)=>{
+                coinPaymentsClient.rates({short:1}, function(err,result){
+                let BtcTokenValue = 0;
+                if(err){
+                    axios
+                    .get(CONVERSION_URL)
+                    .then(res => {
+                        resolve( res.data.BTC.ETH *4000);
+                    })
+                    .catch(err =>
+                    {
+                         resolve(BtcTokenValue); 
+                    });
+                }
+                else{
+                    BtcTokenValue = (1/result.ETH.rate_btc) * 4000;
+                    resolve(BtcTokenValue);
+                }
+            });
         });
     },
     getBonusTokens(ether){
+        let bonus = 0;
         if(ether >= 5){
             bonus= ether * 0.50;
           }
@@ -44,6 +48,6 @@ module.exports = {
           else if(ether >= 1){
             bonus= ether * 0.10;
           }  
-          return bonus;
+          return bonus * this.getETHTokenValue();
     }
 };
