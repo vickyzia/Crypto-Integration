@@ -20,4 +20,6 @@ export const CHANGE_COIN_TYPE = "CHANGE_COIN_TYPE";
 
 
 export const OPEN_NEW_WINDOW = "OPEN_NEW_WINDOW";
+
+export const GET_USER_PAYMENT_DATA = "GET_USER_PAYMENT_DATA";
  

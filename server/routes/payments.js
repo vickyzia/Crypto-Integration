@@ -2,6 +2,7 @@ const express = require('express');
 const validateToken = require('../validation/verify-token');
 const paymentValidations = require('../validation/payment');
 const Payment = require('../models/Payment');
+const User = require('../models/User');
 const Wallet = require('../models/Wallet');
 const tokenValue = require('../config/token-value');
 const transactionMedium = require('../config/transaction-medium');
@@ -228,7 +229,18 @@ router.post('/transactionNotification', (req,res)=>{
             return res.status(500).json(errors);
         });
 });
-
+router.get('/loadUserPaymentInfo', validateToken, (req,res)=>{
+    var data = req.body;
+    let errors = {};
+    let tokenBalance = 0;
+    User.findOne({email: data.email}).then(user=>{
+        tokenBalance = user.hftBal;
+        return res.status(200).json(tokenBalance);
+    }).catch(err => {
+        errors.message = "Unable to find current user";
+        return res.status(401).json(errors);
+    });
+});
 module.exports = router;
 
 

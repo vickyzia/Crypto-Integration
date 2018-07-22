@@ -21,11 +21,11 @@ const UserSchema = new Schema({
         type: String
     },
     hftBal: {
-        type: Schema.Types.Decimal128,
+        type: Number,
         default: 0
     },
     hftBlockchainSent: {
-        type: Schema.Types.Decimal128,
+        type: Number,
         default: 0
     },
     ETH: {

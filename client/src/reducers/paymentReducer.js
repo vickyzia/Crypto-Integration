@@ -9,7 +9,8 @@ import {
     CHANGE_COIN_TYPE,
     CP_PAYMENT_TRANSACTION_STATUS,
     CREATE_CP_PAYMENT_TRANSACTION,
-    CP_PAYMENT_LINK_UPDATE
+    CP_PAYMENT_LINK_UPDATE,
+    GET_USER_PAYMENT_DATA
 } from '../actions/types';
 import {ETH,BTC} from '../utils/constants'
 const initialState = {
@@ -28,7 +29,8 @@ const initialState = {
     coinType:ETH,
     isCPTransactionInProgress: false,
     CPTransactionStatus :0,
-    CPLastPaymentLink: ""
+    CPLastPaymentLink: "",
+    userTokens: "-"
 };
 
 export default function (state = initialState, action) {
@@ -91,6 +93,12 @@ export default function (state = initialState, action) {
                 ...state,
                 CPLastPaymentLink: action.payload.CPLastPaymentLink
             }
+        case GET_USER_PAYMENT_DATA:{
+            return{
+                ...state,
+                userTokens: action.payload.userTokens
+            }
+        }
         case TRANSACTION_SENT:
             return state;
         default:

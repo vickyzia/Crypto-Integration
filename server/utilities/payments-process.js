@@ -5,7 +5,7 @@ var transactionMediums = require('../config/transaction-medium');
 const Web3 = require('web3');
 const paymentConfigs = require('../config/payment-configs');
 const paymentStatus = require('../config/transaction-status');
-
+const bson = require('bson');
 var Coinpayments = require('coinpayments');
 var coinPaymentsClient = new Coinpayments({
     key: '94850cce3d7bbd018077ecf3b8c89315c90836710f1ed4a16f64d1181567380d',

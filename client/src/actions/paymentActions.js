@@ -12,7 +12,8 @@ import {
     CREATE_CP_PAYMENT_TRANSACTION,
     CP_PAYMENT_TRANSACTION_STATUS,
     OPEN_NEW_WINDOW,
-    CP_PAYMENT_LINK_UPDATE
+    CP_PAYMENT_LINK_UPDATE,
+    GET_USER_PAYMENT_DATA
 } from './types';
 import {getAccounts} from '../utils/metaMask'
 
@@ -208,4 +209,25 @@ export const CPPaymentLinkUpdate = (link) => {
                 CPLastPaymentLink: link
             }
         }
+}
+export const getUserPaymentData= ()=> dispatch =>{
+    axios
+    .get(BASE_URL+'/api/payments/loadUserPaymentInfo')
+    .then(res => {
+        console.log(res);
+        dispatch(getUserPaymentDataCreator(res.data));
+    })
+    .catch(err =>
+        {
+            console.log(err);
+        }
+    );
+}
+export const getUserPaymentDataCreator = (tokens)=>{
+    return {
+        type: GET_USER_PAYMENT_DATA,
+        payload: {
+            userTokens: tokens
+        }
+    }
 }

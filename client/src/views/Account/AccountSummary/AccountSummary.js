@@ -1,8 +1,15 @@
 import React, { Component } from "react";
 import "./dashboard_dashboard.css";
 import "../../../bit_common.css";
-
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import {
+  getUserPaymentData
+} from "../../../actions/paymentActions";
 class AccountSummary extends Component {
+  componentDidMount(){
+    this.props.getUserPaymentData();
+  }
   render() {
     return (
       <div className="animated fadeIn">
@@ -59,7 +66,7 @@ class AccountSummary extends Component {
             </div>
             <div className="bit_card_container bit_mb_20">
               <div className="bit_card_title">Account Summary</div>
-              <div className="bit_card_content">Token Balance: -</div>
+              <div className="bit_card_content">Token Balance: {this.props.userTokens}</div>
             </div>
             <div className="bit_card_container bit_mb_20">
               <div className="bit_card_title">Payout History</div>
@@ -76,4 +83,15 @@ class AccountSummary extends Component {
   }
 }
 
-export default AccountSummary;
+AccountSummary.propTypes = {
+  userTokens : PropTypes.string.isRequired,
+  getUserPaymentData : PropTypes.func.isRequired
+};
+
+const mapStateToProps = state => ({
+  userTokens : state.payment.userTokens
+});
+
+export default connect(
+  mapStateToProps,{getUserPaymentData:getUserPaymentData}
+)(AccountSummary);
