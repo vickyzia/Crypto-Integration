@@ -22,7 +22,11 @@ module.exports={
                 if(payments!=null){
                     payments.forEach(payment => {
                         let totalTokens = payment.tokens + payment.bonusTokens;
-                        User.findById(payment._userId).then(user=>{
+                        User.findById(payment._userId).then(async user=>{
+                            let referrals = await module.exports.getReferralUsers(user);
+                            //Update user balance and save 
+                            
+                            //if one save fails revert all.
                             user.hftBal += totalTokens;
                             payment.isProcessed = true;
                             payment.save((errP,updatedPayment)=>{
@@ -50,6 +54,37 @@ module.exports={
                     });
                 }
             }
+        });
+    },
+    getReferralUsers(user){
+        return new Promise((resolve,reject)=>{
+            let referrals = {};
+            User.findOne({refcode: user.sponsor}).then(ref1 => {
+                if(!ref1){
+                    resolve(referrals);
+                    return;
+                }
+                referrals.referralLevelOne = ref1;
+                User.findOne({refcode:ref1.sponsor}).then(ref2 => {
+                    if(!ref2){
+                        resolve(referrals);
+                        return;
+                    }
+                    referrals.referralLevelTwo = ref2;
+                    User.findOne({refcode: ref2.sponsor}).then(ref3=>{
+                        if(!ref3){
+                            resolve(referrals);
+                            return;
+                        }
+                        referrals.referralLevelThree = ref3;
+                        resolve(referrals);
+                    }).catch(err=>{ resolve(referrals)});
+                }).catch(err=>{
+                    resolve(referrals);
+                })
+            }).catch(err =>{
+                resolve(referrals);
+            });
         });
     },
     async confirmTransactions(){
