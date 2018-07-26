@@ -7,6 +7,8 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const cors = require('cors');
 var schedule = require('node-schedule');
+var fawn = require('fawn');
+fawn.init(mongoose);
 var {processPayments, confirmTransactions} = require('./utilities/payments-process');
 
 const app = express(); // initialize express into app

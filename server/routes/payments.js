@@ -2,6 +2,7 @@ const express = require('express');
 const validateToken = require('../validation/verify-token');
 const paymentValidations = require('../validation/payment');
 const Payment = require('../models/Payment');
+const Payout = require('../models/Payout');
 const User = require('../models/User');
 const Wallet = require('../models/Wallet');
 const tokenValue = require('../config/token-value');
@@ -234,8 +235,14 @@ router.get('/loadUserPaymentInfo', validateToken, (req,res)=>{
     let errors = {};
     let tokenBalance = 0;
     User.findOne({email: data.email}).then(user=>{
+        
         tokenBalance = user.hftBal;
-        return res.status(200).json(tokenBalance);
+        Payout.find({_userId: user._id}).then(payouts=>{
+            return res.status(200).json({tokens:tokenBalance.toString(), payoutHistory:payouts});
+        }).catch(err=>{
+            errors.message = "Unable to find errors";
+            return res.status(401).json(errors);
+        });
     }).catch(err => {
         errors.message = "Unable to find current user";
         return res.status(401).json(errors);

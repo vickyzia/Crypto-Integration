@@ -4,7 +4,11 @@ const payoutTypes = require('../config/payout-types');
 const payoutStatuses = require('../config/payout-status');
 
 const PayoutSchema = new Schema({
-
+    _userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'User' 
+    },
     tokens:{
         type : Number,
         required:true,
@@ -34,3 +38,4 @@ const PayoutSchema = new Schema({
         required: false
     },
 });
+module.exports = Payout = mongoose.model('payouts', PayoutSchema);

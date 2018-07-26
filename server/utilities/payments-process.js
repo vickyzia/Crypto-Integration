@@ -7,10 +7,15 @@ const paymentConfigs = require('../config/payment-configs');
 const paymentStatus = require('../config/transaction-status');
 const bson = require('bson');
 var Coinpayments = require('coinpayments');
+var Fawn = require("fawn");
 var coinPaymentsClient = new Coinpayments({
     key: '94850cce3d7bbd018077ecf3b8c89315c90836710f1ed4a16f64d1181567380d',
     secret: 'f73f21154c9f00A19DF62C3EA63d1f834aD42afa5c46DeB25f858Cf4F1576Fd9'
   }); 
+var payoutTypes = require('../config/payout-types');
+var payoutStatuses = require('../config/payout-status');
+
+
 module.exports={ 
     processPayments(){
         Payment.find({transactionStatus:transactionStatus.completed, isProcessed:false}).exec((err, payments)=>{
@@ -23,30 +28,13 @@ module.exports={
                     payments.forEach(payment => {
                         let totalTokens = payment.tokens + payment.bonusTokens;
                         User.findById(payment._userId).then(async user=>{
-                            let referrals = await module.exports.getReferralUsers(user);
-                            //Update user balance and save 
-                            //if one save fails revert all.
-                            user.hftBal += totalTokens;
-                            payment.isProcessed = true;
-                            payment.save((errP,updatedPayment)=>{
-                                if(errP){
-                                    console.log(errP);
-                                }
-                                else{
-                                    user.save((errU,updatedUser)=>{
-                                        if(errU){
-                                            payment.isProcessed = false;
-                                            payment.save((errAgain,updatedP)=>{
-                                                if(errAgain)
-                                                    console.log("Error with transaction.");
-                                            });
-                                        }
-                                        else{
-                                            console.log("Process Complete for payment: "+ payment._id);
-                                        }
-                                    });
-                                }
-                            });                    
+                            module.exports.updateBalanceAndCreatePayout(user,payment)
+                                .then(results => {
+                                    console.log(payment._id + " is sucessfull processed");
+                                })
+                                .catch(err=>{
+                                    console.log(payment._id + " threw an error while processing: " + err);
+                                });
                         }).catch(error=>{
                             console.log(error);
                         });
@@ -55,17 +43,37 @@ module.exports={
             }
         });
     },
-    updateBalanceAndCreatePayout(user, referrals, tokens, bonusTokens){
-        return new Promise((resolve, reject) => {
-            let completed = [];
-            user.tokens = tokens + bonusTokens;
-            if(referrals.referralLevelOne != null){
-                referrals.referralLevelOne.tokens = tokens * 0.10;
+    async updateBalanceAndCreatePayout(user, payment){
+            let tokens = payment.tokens;
+            let bonusTokens = payment.bonusTokens;
+            let referrals = await module.exports.getReferralUsers(user);
+            var task = Fawn.Task();
+            task.update("users",{_id:user._id},{tokens: user.tokens+tokens+bonusTokens});
+            task.save("payouts", {tokens: tokens+ bonusTokens,transactionId:payment.transactionId, 
+                payoutType: payoutTypes.Purchase, payoutStatus: payoutStatuses.AddedToUserAccount, _userId: user._id});
+            if(referrals.referralLevelOne){
+                task.update("users",{_id:referrals.referralLevelOne._id},
+                    {tokens: referrals.referralLevelOne.tokens + (tokens * 0.10)});
+                task.save("payouts", {tokens: tokens*0.10,transactionId:user.email, 
+                    payoutType: payoutTypes.ReferralLevelOne, payoutStatus: payoutStatuses.AddedToUserAccount, 
+                        _userId: referrals.referralLevelOne._id });
             }
-        });
-    },
-    createPayout(user, transactionId, tokens){
-
+            if(referrals.referralLevelTwo){
+                task.update("users",{_id:referrals.referralLevelTwo._id},
+                    {tokens: referrals.referralLevelTwo.tokens + (tokens * 0.05)});
+                task.save("payouts", {tokens: tokens*0.05,transactionId:referrals.referralLevelOne.email, 
+                    payoutType: payoutTypes.ReferralLevelTwo, payoutStatus: payoutStatuses.AddedToUserAccount,
+                    _userId: referrals.referralLevelTwo._id});
+            }
+            if(referrals.referralLevelThree){
+                task.update("users",{_id:referrals.referralLevelThree._id},
+                    {tokens: referrals.referralLevelThree.tokens + (tokens * 0.03)});
+                task.save("payouts", {tokens: tokens*0.03,transactionId:referrals.referralLevelTwo.email, 
+                    payoutType: payoutTypes.ReferralLevelThree, payoutStatus: payoutStatuses.AddedToUserAccount,
+                    _userId: referrals.referralLevelThree._id});
+            }
+            task.update("payments", {_id:payment._id},{isProcessed:true});
+            return task.run();
     },
     getReferralUsers(user){
         return new Promise((resolve,reject)=>{

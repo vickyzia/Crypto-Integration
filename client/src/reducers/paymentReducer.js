@@ -30,7 +30,8 @@ const initialState = {
     isCPTransactionInProgress: false,
     CPTransactionStatus :0,
     CPLastPaymentLink: "",
-    userTokens: "-"
+    userTokens: "-",
+    payoutHistory: []
 };
 
 export default function (state = initialState, action) {
@@ -96,7 +97,8 @@ export default function (state = initialState, action) {
         case GET_USER_PAYMENT_DATA:{
             return{
                 ...state,
-                userTokens: action.payload.userTokens
+                userTokens: action.payload.userTokens,
+                payoutHistory: action.payload.payoutHistory
             }
         }
         case TRANSACTION_SENT:

@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import {
   getUserPaymentData
 } from "../../../actions/paymentActions";
+import PayoutHistory from "../PayoutHistory/PayoutHistory";
 class AccountSummary extends Component {
   componentDidMount(){
     this.props.getUserPaymentData();
@@ -70,7 +71,9 @@ class AccountSummary extends Component {
             </div>
             <div className="bit_card_container bit_mb_20">
               <div className="bit_card_title">Payout History</div>
-              <div className="bit_card_content">-</div>
+              <div className="bit_card_content">
+                  <PayoutHistory />
+              </div>
             </div>
             <div className="bit_card_container">
               <div className="bit_card_title">Activity History</div>

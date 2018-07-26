@@ -215,7 +215,7 @@ export const getUserPaymentData= ()=> dispatch =>{
     .get(BASE_URL+'/api/payments/loadUserPaymentInfo')
     .then(res => {
         console.log(res);
-        dispatch(getUserPaymentDataCreator(res.data));
+        dispatch(getUserPaymentDataCreator(res.data.tokens, res.data.payoutHistory));
     })
     .catch(err =>
         {
@@ -223,11 +223,12 @@ export const getUserPaymentData= ()=> dispatch =>{
         }
     );
 }
-export const getUserPaymentDataCreator = (tokens)=>{
+export const getUserPaymentDataCreator = (tokens, payoutHistory)=>{
     return {
         type: GET_USER_PAYMENT_DATA,
         payload: {
-            userTokens: tokens
+            userTokens: tokens,
+            payoutHistory: payoutHistory
         }
     }
 }
