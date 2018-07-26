@@ -25,7 +25,6 @@ module.exports={
                         User.findById(payment._userId).then(async user=>{
                             let referrals = await module.exports.getReferralUsers(user);
                             //Update user balance and save 
-                            
                             //if one save fails revert all.
                             user.hftBal += totalTokens;
                             payment.isProcessed = true;
@@ -55,6 +54,18 @@ module.exports={
                 }
             }
         });
+    },
+    updateBalanceAndCreatePayout(user, referrals, tokens, bonusTokens){
+        return new Promise((resolve, reject) => {
+            let completed = [];
+            user.tokens = tokens + bonusTokens;
+            if(referrals.referralLevelOne != null){
+                referrals.referralLevelOne.tokens = tokens * 0.10;
+            }
+        });
+    },
+    createPayout(user, transactionId, tokens){
+
     },
     getReferralUsers(user){
         return new Promise((resolve,reject)=>{
