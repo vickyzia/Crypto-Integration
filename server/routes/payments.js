@@ -145,6 +145,12 @@ router.post('/createCoinPaymentsTransaction',validateToken, async (req,res)=>{
             return res.status(400).json(errors);
         }
         var secretKey = uuid();
+        var tokenVal = data.paymentType==coinTypes.ether?tokenValue.getETHTokenValue():
+            await tokenValue.getBTCTokenValue();
+        if(tokenVal == 0){
+            errors.message = "Unable to fetch BTC coin value";
+            return res.status(400).json(errors);
+        }
         coinPaymentsClient.createTransaction({
             amount:data.amount,
             currency1: 'LTCT',//For Testing use data.paymentType for production
@@ -156,8 +162,6 @@ router.post('/createCoinPaymentsTransaction',validateToken, async (req,res)=>{
                 errors.message = err;
                 return res.status(400).json(errors);
             }
-            var tokenVal = data.paymentType==coinTypes.ether?tokenValue.getETHTokenValue():
-            await tokenValue.getBTCTokenValue();
             var newPayment = new Payment({
                 transactionId: result.txn_id,
                 paymentType: data.paymentType,
@@ -173,10 +177,6 @@ router.post('/createCoinPaymentsTransaction',validateToken, async (req,res)=>{
                 bonusTokens: data.paymentType==coinTypes.ether?tokenValue.getBonusTokens(data.amount) :
                 tokenValue.getBonusTokens((data.amount * tokenVal)/tokenValue.getETHTokenValue())
             });
-            if(newPayment.tokenValue == 0){
-                errors.message = "Unable to fetch BTC coin value";
-                return res.status(400).json(errors);
-            }
             newPayment.save()
                 .then(payment=>{
                     return res.status(200).json(payment);

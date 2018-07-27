@@ -17,14 +17,7 @@ class MetaMaskPaymentOption extends React.Component{
         this.createTransaction = this.createTransaction.bind(this);
         this.transactionCallback = this.transactionCallback.bind(this);
     }
-    componentDidMount() {
-        console.log("mounted");
-        this.loadInterval = setInterval(()=>this.props.loadComplete(this.props.paymentData), 2000)
-      }
     render(){
-        if(this.props.isLoading || this.props.isLoading == undefined){
-            return ("Loading..");
-        }
         if(this.props.isTransactionInProgress){
             return (<div>Please complete the transaction in MetaMask to continue. Note: Don't close this window.</div>);
         }
@@ -39,7 +32,7 @@ class MetaMaskPaymentOption extends React.Component{
         }
 
         return (          
-            <button onClick={this.createTransaction} disabled={this.props.paymentAmount == 0 ||this.props.paymentAmount == null}>Pay with Metamask</button>
+            <button onClick={this.createTransaction} disabled={this.props.paymentAmount < 0 ||this.props.paymentAmount == null || this.props.paymentAmount == NaN}>Pay with Metamask</button>
         );
     }
     componentWillUnmount() {

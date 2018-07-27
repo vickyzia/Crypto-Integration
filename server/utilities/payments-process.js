@@ -48,26 +48,26 @@ module.exports={
             let bonusTokens = payment.bonusTokens;
             let referrals = await module.exports.getReferralUsers(user);
             var task = Fawn.Task();
-            task.update("users",{_id:user._id},{tokens: user.tokens+tokens+bonusTokens});
+            task.update("users",{_id:user._id},{hftBal: user.hftBal+tokens+bonusTokens});
             task.save("payouts", {tokens: tokens+ bonusTokens,transactionId:payment.transactionId, 
                 payoutType: payoutTypes.Purchase, payoutStatus: payoutStatuses.AddedToUserAccount, _userId: user._id});
             if(referrals.referralLevelOne){
                 task.update("users",{_id:referrals.referralLevelOne._id},
-                    {tokens: referrals.referralLevelOne.tokens + (tokens * 0.10)});
+                    {hftBal: referrals.referralLevelOne.hftBal + (tokens * 0.10)});
                 task.save("payouts", {tokens: tokens*0.10,transactionId:user.email, 
                     payoutType: payoutTypes.ReferralLevelOne, payoutStatus: payoutStatuses.AddedToUserAccount, 
                         _userId: referrals.referralLevelOne._id });
             }
             if(referrals.referralLevelTwo){
                 task.update("users",{_id:referrals.referralLevelTwo._id},
-                    {tokens: referrals.referralLevelTwo.tokens + (tokens * 0.05)});
+                    {hftBal: referrals.referralLevelTwo.hftBal + (tokens * 0.05)});
                 task.save("payouts", {tokens: tokens*0.05,transactionId:referrals.referralLevelOne.email, 
                     payoutType: payoutTypes.ReferralLevelTwo, payoutStatus: payoutStatuses.AddedToUserAccount,
                     _userId: referrals.referralLevelTwo._id});
             }
             if(referrals.referralLevelThree){
                 task.update("users",{_id:referrals.referralLevelThree._id},
-                    {tokens: referrals.referralLevelThree.tokens + (tokens * 0.03)});
+                    {hftBal: referrals.referralLevelThree.hftBal + (tokens * 0.03)});
                 task.save("payouts", {tokens: tokens*0.03,transactionId:referrals.referralLevelTwo.email, 
                     payoutType: payoutTypes.ReferralLevelThree, payoutStatus: payoutStatuses.AddedToUserAccount,
                     _userId: referrals.referralLevelThree._id});

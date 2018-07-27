@@ -53,6 +53,7 @@ export const loadCompleteActionCreator = (netId, paymentData, metamaskAccounts) 
 export const updatePayment = (amount) => dispatch => {
     if(!(amount instanceof Number)){
         amount = Number(amount);
+        amount = amount == NaN?0:amount;
     }
     dispatch(updatePaymentActionCreator(amount));
 }

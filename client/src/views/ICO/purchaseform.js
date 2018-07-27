@@ -24,43 +24,42 @@ class DashboardICO extends Component {
     this.calculateTokenAmount = this.calculateTokenAmount.bind(this);
     this.calculateBonusTokensAmount = this.calculateBonusTokensAmount.bind(this);
     this.state = {
-      visible: false,
-      tokens: 0,
-      bonusTokens: 0
+      visible: false
     };
   }
   onAmountChange(event) {
     this.props.updatePayment(event.target.value);
-    if(this.props.paymentData!=null){
-      this.state.tokens = this.calculateTokenAmount(event.target.value);
-      this.state.bonusTokens = this.calculateBonusTokensAmount(event.target.value);
-    }
   }
-  calculateTokenAmount(paymentAmount){
+  calculateTokenAmount(){
+    if(!this.props.paymentData)
+      return 0;
     if(this.props.coinType == BTC){
-      return paymentAmount * this.props.paymentData.BtcTokenValue;
+      return this.props.paymentAmount * this.props.paymentData.BtcTokenValue;
     }
     else{
-      return paymentAmount * this.props.paymentData.EtherTokenValue;
+      return this.props.paymentAmount * this.props.paymentData.EtherTokenValue;
     }
   }
-  calculateBonusTokensAmount(paymentAmount){
-    let ether = paymentAmount;
+  calculateBonusTokensAmount(){
+    if(!this.props.paymentData)
+      return 0;
+    let ether = this.props.paymentAmount;
     if(this.props.coinType == BTC){
-      ether = (paymentAmount * this.props.paymentData.BtcTokenValue)/this.props.paymentData.EtherTokenValue;
+      ether = (this.props.paymentAmount * this.props.paymentData.BtcTokenValue)/this.props.paymentData.EtherTokenValue;
     }
     let bonus = 0;
+    let tokens = this.calculateTokenAmount();
     if(ether >= 5){
-      bonus= this.state.tokens * 0.50;
+      bonus= tokens* 0.50;
     }
     else if(ether >= 3){
-      bonus = this.state.tokens * 0.30;
+      bonus = tokens * 0.30;
     }
     else if(ether >= 2){
-      bonus= this.state.tokens * 0.20;
+      bonus= tokens * 0.20;
     }
     else if(ether >= 1){
-      bonus= this.state.tokens * 0.10;
+      bonus= tokens* 0.10;
     }  
     return bonus;
   }
@@ -74,6 +73,10 @@ class DashboardICO extends Component {
     this.setState({
       visible: false
     });
+  }
+  componentDidMount() {
+    console.log("mounted");
+    this.loadInterval = setInterval(()=>this.props.loadComplete(this.props.paymentData), 2000)
   }
 
   render() {
@@ -113,11 +116,12 @@ class DashboardICO extends Component {
               <div>
                 <input
                   className="contribute_input"
-                  type="text"
+                  type="number"
                   placeholder={
                     "Amount of " + this.props.coinType + " to contribute"
                   }
                   onChange={this.onAmountChange}
+                  value = {this.props.paymentAmount<=0?"":this.props.paymentAmount}
                 />
               </div>
             </div>
@@ -125,28 +129,35 @@ class DashboardICO extends Component {
             <div className="ico_flex_row">
               <div className="ico_contribute_left">Tokens Purchased:</div>
               <div className="ico_contribute_right">
-                {this.state.tokens}{" "}
+                {this.calculateTokenAmount()}{" "}
               </div>
             </div>
             <div className="ico_flex_row">
               <div className="ico_contribute_left">Bonus Tokens Received:</div>
               <div className="ico_contribute_right">
-                {this.state.bonusTokens}{" "}
+                {this.calculateBonusTokensAmount()}{" "}
               </div>
             </div>
             <div className="ico_flex_row">
               <div className="ico_contribute_left">Total Tokens Received:</div>
               <div className="ico_contribute_right">
-                {this.state.tokens + this.state.bonusTokens}{" "}
+                {(this.calculateTokenAmount() + this.calculateBonusTokensAmount(this.props.paymentAmount))}{" "}
               </div>
             </div>
+            
             <div className="pay_buttons">
               {this.props.coinType === ETH && (
                 <div className="flex_row flex_justified">
-                  <MetaMaskPaymentOption />
+                {this.props.isLoading == false && <MetaMaskPaymentOption />}
+                  
                 </div>
               )}
-              <CoinPaymentsOption />
+              {this.props.isLoading == false? 
+              this.props.coinType == BTC && 
+              (this.props.paymentData == null || this.props.paymentData.BtcTokenValue == 0)?
+              "Error loading Bitcoin information. Please try again.": <CoinPaymentsOption /> 
+              : "Loading..."}
+            
             </div>
           </div>
         </div>
@@ -154,6 +165,10 @@ class DashboardICO extends Component {
   }
   handleCoinChange(event) {
     this.props.changeCoinType(event.target.value);
+    this.props.updatePayment(0);//Reset whenever the coin type changes
+  }
+  componentWillUnmount() {
+    this.props.updatePayment(0);
   }
 }
 
@@ -163,13 +178,15 @@ DashboardICO.propTypes = {
   paymentData: PropTypes.object,
   paymentAmount: PropTypes.number,
   coinType: PropTypes.string.isRequired,
-  changeCoinType: PropTypes.func.isRequired
+  changeCoinType: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = state => ({
   paymentData: state.payment.paymentData,
   paymentAmount: state.payment.paymentAmount,
-  coinType: state.payment.coinType
+  coinType: state.payment.coinType,
+  isLoading: state.payment.isLoading,
 });
 
 export default connect(

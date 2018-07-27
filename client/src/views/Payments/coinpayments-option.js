@@ -16,7 +16,7 @@ class CoinPaymentsOption extends React.Component{
         return (
             <Fragment>    
                 <div className="flex_row flex_justified">      
-                    <button onClick={this.createTransaction} disabled={this.props.paymentAmount == 0 ||this.props.paymentAmount == null}>Pay with CoinPayment</button>
+                    <button onClick={this.createTransaction} disabled={this.props.paymentAmount < 0 ||this.props.paymentAmount == null || this.props.paymentAmount == NaN}>Pay with CoinPayment</button>
                 </div>
                 <div className="flex_row flex_justified align-center">{this.props.CPTransactionStatus == 1 ?
                     "Transaction created. " :
