@@ -8,7 +8,8 @@ const crypto = require("crypto");
 const smtpTransport = require("nodemailer-smtp-transport");
 const secret = "secret";
 const isEmpty = require("../validation/is-empty");
-
+const validateToken = require('../validation/verify-token');
+const moment = require('moment');
 // Load input validation
 const validateRegisterInput = require("../validation/register");
 const validateLoginInput = require("../validation/login");
@@ -162,7 +163,7 @@ router.post("/login", (req, res) => {
   });
 });
 
-router.post("/change-password", (req, res) => {
+router.post("/change-password",validateToken, (req, res) => {
   const { errors, isValid } = validateChangePasswordInput(req.body);
 
   // Check validation
@@ -207,7 +208,7 @@ router.post("/change-password", (req, res) => {
   });
 });
 
-router.post("/update-wallet", (req, res) => {
+router.post("/update-wallet",validateToken, (req, res) => {
   const { errors, isValid } = validateUpdateWalletInput(req.body);
 
   // Check validation
@@ -225,6 +226,15 @@ router.post("/update-wallet", (req, res) => {
       return res.status(404).json(errors);
     } else {
       user.ETH = newWallet;
+      var allowChange = true;
+      if(user.lastUpdatedETH){
+        let differentDays = moment(Date.now()).diff(user.lastUpdatedETH, 'days');
+        if(differentDays < 1){
+          errors.wallet = "Wallet Address has been updated in last 24 hours.";
+          return res.status(400).json(errors);
+        }
+      }
+      user.lastUpdatedETH = Date.now();
       user
         .save()
         .then(user => {
@@ -238,6 +248,24 @@ router.post("/update-wallet", (req, res) => {
   });
 });
 
+router.get("/loadUserWalletData",validateToken, (req, res) => {
+  const errors ={};
+  const email = req.body.email;
+
+  // find user by email
+  User.findOne({ email: email }).then(user => {
+    if (!user) {
+      errors.loadUserWalletData = "User email not found!";
+      return res.status(404).json(errors);
+    } else {
+      var differentDays = 2;
+      if(user.lastUpdatedETH){
+        differentDays = moment(Date.now()).diff(user.lastUpdatedETH, 'days');
+      }
+      return res.status(200).json({userWalletAddress: user.ETH, walletLastUpdatedDays:differentDays});
+    }
+  });
+});
 router.get("/confirmation/:token", (req, res) => {
   const errors = {};
 

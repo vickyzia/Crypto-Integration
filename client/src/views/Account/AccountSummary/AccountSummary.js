@@ -72,7 +72,9 @@ class AccountSummary extends Component {
             <div className="bit_card_container bit_mb_20">
               <div className="bit_card_title">Payout History</div>
               <div className="bit_card_content">
-                  <PayoutHistory />
+                  <div className='payout_table'>
+                    <PayoutHistory />
+                  </div>
               </div>
             </div>
             <div className="bit_card_container">

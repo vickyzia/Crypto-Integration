@@ -10,7 +10,9 @@ import {
     CP_PAYMENT_TRANSACTION_STATUS,
     CREATE_CP_PAYMENT_TRANSACTION,
     CP_PAYMENT_LINK_UPDATE,
-    GET_USER_PAYMENT_DATA
+    GET_USER_PAYMENT_DATA,
+    WALLET_DATA_IS_LOADING,
+    GET_USER_WALLET_DATA
 } from '../actions/types';
 import {ETH,BTC} from '../utils/constants'
 const initialState = {
@@ -31,7 +33,10 @@ const initialState = {
     CPTransactionStatus :0,
     CPLastPaymentLink: "",
     userTokens: "-",
-    payoutHistory: []
+    payoutHistory: [],
+    userWalletAddress: '-',
+    walletLastUpdatedDays: 2,
+    walletDataIsLoading: false
 };
 
 export default function (state = initialState, action) {
@@ -99,6 +104,19 @@ export default function (state = initialState, action) {
                 ...state,
                 userTokens: action.payload.userTokens,
                 payoutHistory: action.payload.payoutHistory
+            }
+        }
+        case WALLET_DATA_IS_LOADING:{
+            return {
+                ...state,
+                walletDataIsLoading: action.payload.walletDataIsLoading
+            }
+        }
+        case GET_USER_WALLET_DATA:{
+            return {
+                ...state,
+                userWalletAddress: action.payload.userWalletAddress,
+                walletLastUpdatedDays:action.payload.walletLastUpdatedDays
             }
         }
         case TRANSACTION_SENT:

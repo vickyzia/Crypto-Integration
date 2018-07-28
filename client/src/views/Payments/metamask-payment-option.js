@@ -37,7 +37,6 @@ class MetaMaskPaymentOption extends React.Component{
     }
     componentWillUnmount() {
         console.log("unmounted");
-        clearInterval(this.loadInterval);
       }
     createTransaction(event){
         let r = this.props.paymentData.wallets.length - 1;

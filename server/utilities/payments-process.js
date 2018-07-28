@@ -50,27 +50,28 @@ module.exports={
             var task = Fawn.Task();
             task.update("users",{_id:user._id},{hftBal: user.hftBal+tokens+bonusTokens});
             task.save("payouts", {tokens: tokens+ bonusTokens,transactionId:payment.transactionId, 
-                payoutType: payoutTypes.Purchase, payoutStatus: payoutStatuses.AddedToUserAccount, _userId: user._id});
+                payoutType: payoutTypes.Purchase, payoutStatus: payoutStatuses.AddedToUserAccount, _userId: user._id, 
+                createdAt:Date.now()});
             if(referrals.referralLevelOne){
                 task.update("users",{_id:referrals.referralLevelOne._id},
                     {hftBal: referrals.referralLevelOne.hftBal + (tokens * 0.10)});
                 task.save("payouts", {tokens: tokens*0.10,transactionId:user.email, 
                     payoutType: payoutTypes.ReferralLevelOne, payoutStatus: payoutStatuses.AddedToUserAccount, 
-                        _userId: referrals.referralLevelOne._id });
+                        _userId: referrals.referralLevelOne._id, createdAt:Date.now() });
             }
             if(referrals.referralLevelTwo){
                 task.update("users",{_id:referrals.referralLevelTwo._id},
                     {hftBal: referrals.referralLevelTwo.hftBal + (tokens * 0.05)});
-                task.save("payouts", {tokens: tokens*0.05,transactionId:referrals.referralLevelOne.email, 
+                task.save("payouts", {tokens: tokens*0.05,transactionId:user.email, 
                     payoutType: payoutTypes.ReferralLevelTwo, payoutStatus: payoutStatuses.AddedToUserAccount,
-                    _userId: referrals.referralLevelTwo._id});
+                    _userId: referrals.referralLevelTwo._id, createdAt:Date.now()});
             }
             if(referrals.referralLevelThree){
                 task.update("users",{_id:referrals.referralLevelThree._id},
                     {hftBal: referrals.referralLevelThree.hftBal + (tokens * 0.03)});
-                task.save("payouts", {tokens: tokens*0.03,transactionId:referrals.referralLevelTwo.email, 
+                task.save("payouts", {tokens: tokens*0.03,transactionId:user.email, 
                     payoutType: payoutTypes.ReferralLevelThree, payoutStatus: payoutStatuses.AddedToUserAccount,
-                    _userId: referrals.referralLevelThree._id});
+                    _userId: referrals.referralLevelThree._id,createdAt:Date.now()});
             }
             task.update("payments", {_id:payment._id},{isProcessed:true});
             return task.run();
@@ -158,7 +159,7 @@ module.exports={
                     payment.transactionStatus = status;
                     Payment.update({ transactionId: payment.transactionId, _userId: payment._userId }, {
                         transactionStatus: status,
-                        completedAt: Date.Now
+                        completedAt: Date.now()
                     }, function (err, affected, resp) {
                         if(err)
                             console.log(err);
@@ -180,7 +181,7 @@ module.exports={
                     payment.transactionStatus = status;
                     Payment.update({ transactionId: payment.transactionId, _userId: payment._userId }, {
                         transactionStatus: status,
-                        completedAt: Date.Now
+                        completedAt: Date.now()
                     }, function (err, affected, resp) {
                         return resolve(payment);
                     });

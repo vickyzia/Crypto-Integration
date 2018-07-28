@@ -13,7 +13,9 @@ import {
     CP_PAYMENT_TRANSACTION_STATUS,
     OPEN_NEW_WINDOW,
     CP_PAYMENT_LINK_UPDATE,
-    GET_USER_PAYMENT_DATA
+    GET_USER_PAYMENT_DATA,
+    GET_USER_WALLET_DATA,
+    WALLET_DATA_IS_LOADING
 } from './types';
 import {getAccounts} from '../utils/metaMask'
 
@@ -21,6 +23,7 @@ export const loadComplete = (paymentData) => dispatch => {
     if(window.web3){
         let netId = window.web3.version.network != undefined?  Number(window.web3.version.network):-1;
         if(netId != -1 && !paymentData){
+            console.log("Loading Payment");
             axios
             .get(BASE_URL+'/api/payments/loadPaymentData')
             .then(res => {
@@ -33,6 +36,7 @@ export const loadComplete = (paymentData) => dispatch => {
             );
         }     
         else{
+            //TODO: Only dispatch if there is an update.
             dispatch(loadCompleteActionCreator(netId,paymentData,getAccounts()));
         }   
     }
@@ -230,6 +234,41 @@ export const getUserPaymentDataCreator = (tokens, payoutHistory)=>{
         payload: {
             userTokens: tokens,
             payoutHistory: payoutHistory
+        }
+    }
+}
+
+export const getUserWalletData= ()=> dispatch =>{
+    dispatch(walletDataIsLoadingCreator(true));
+    axios
+    .get(BASE_URL+'/api/users/loadUserWalletData')
+    .then(res => {
+        console.log(res);
+        dispatch(getUserWalletDataCreator(res.data.userWalletAddress, res.data.walletLastUpdatedDays));
+        dispatch(walletDataIsLoadingCreator(false));
+    })
+    .catch(err =>
+        {
+            console.log(err);
+            dispatch(walletDataIsLoadingCreator(false));
+        }
+    );
+}
+export const getUserWalletDataCreator = (userWalletAddress,walletLastUpdatedDays)=>{
+    return {
+        type: GET_USER_WALLET_DATA,
+        payload: {
+            userWalletAddress: userWalletAddress,
+            walletLastUpdatedDays: walletLastUpdatedDays
+        }
+    }
+}
+
+export const walletDataIsLoadingCreator = (isLoading)=>{
+    return {
+        type: WALLET_DATA_IS_LOADING,
+        payload: {
+            walletDataIsLoading:isLoading
         }
     }
 }

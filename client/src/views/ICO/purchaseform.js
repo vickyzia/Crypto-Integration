@@ -76,7 +76,7 @@ class DashboardICO extends Component {
   }
   componentDidMount() {
     console.log("mounted");
-    this.loadInterval = setInterval(()=>this.props.loadComplete(this.props.paymentData), 2000)
+    this.loadInterval = setInterval(()=>this.props.loadComplete(this.props.paymentData), 10000)
   }
 
   render() {
@@ -169,6 +169,7 @@ class DashboardICO extends Component {
   }
   componentWillUnmount() {
     this.props.updatePayment(0);
+    clearInterval(this.loadInterval);
   }
 }
 

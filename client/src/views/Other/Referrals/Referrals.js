@@ -1,8 +1,14 @@
 import React, { Component } from "react";
 import "./Referrals.css";
 import "../../../bit_common.css";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+import {loadReferralData} from '../../../actions/referralActions'
 
 class Referrals extends Component {
+  componentDidMount(){
+    this.props.loadReferralData();
+  }
   render() {
     return (
       <div className="animated fadeIn">
@@ -48,25 +54,25 @@ class Referrals extends Component {
               <div className="db_ref_section3_content">
                 <div className="db_ref_flex_row">
                   <div className="db_ref_card_left3">Current Sponsor:</div>
-                  <div className="db_ref_card_right3">-</div>
+                  <div className="db_ref_card_right3">{this.props.sponsor == ''? 'N/A':this.props.sponsor}</div>
                 </div>
                 <div className="db_ref_flex_row">
                   <div className="db_ref_card_left3">
                     Referral Bonus Earned:
                   </div>
-                  <div className="db_ref_card_right3">-</div>
+                  <div className="db_ref_card_right3">{this.props.referralBonusEarned}</div>
                 </div>
                 <div className="db_ref_flex_row">
                   <div className="db_ref_card_left3">Level 1 Referrals</div>
-                  <div className="db_ref_card_right3">-</div>
+                  <div className="db_ref_card_right3">{this.props.levelOneReferrals}</div>
                 </div>
                 <div className="db_ref_flex_row">
                   <div className="db_ref_card_left3">Level 2 Referrals</div>
-                  <div className="db_ref_card_right3">-</div>
+                  <div className="db_ref_card_right3">{this.props.levelTwoReferrals}</div>
                 </div>
                 <div className="db_ref_flex_row">
                   <div className="db_ref_card_left3">Level 3 Referrals</div>
-                  <div className="db_ref_card_right3">-</div>
+                  <div className="db_ref_card_right3">{this.props.levelThreeReferrals}</div>
                 </div>
               </div>
             </div>
@@ -76,5 +82,24 @@ class Referrals extends Component {
     );
   }
 }
+Referrals.propTypes = {
+  sponsor: PropTypes.string.isRequired, 
+  referralBonusEarned:PropTypes.number.isRequired,
+  levelOneReferrals: PropTypes.number.isRequired,
+  levelTwoReferrals: PropTypes.number.isRequired,
+  levelThreeReferrals: PropTypes.number.isRequired,
+  loadReferralData : PropTypes.func.isRequired
+};
 
-export default Referrals;
+const mapStateToProps = state => ({
+  sponsor: state.referrals.sponsor, 
+  referralBonusEarned:state.referrals.referralBonusEarned,
+  levelOneReferrals: state.referrals.levelOneReferrals,
+  levelTwoReferrals: state.referrals.levelTwoReferrals,
+  levelThreeReferrals: state.referrals.levelThreeReferrals
+});
+
+export default connect(
+  mapStateToProps,
+  { loadReferralData }
+)(Referrals);

@@ -41,7 +41,7 @@ class ICO extends Component {
             <div className="bit_card_title_fiverr">Fiverr Requirements</div>
             <div className="bit_card_content">
               <div className="bit_align_left">
-              <p>Hello, I have added a few things into the user schema to support what I'm looking for. You can change/delete them if you need to.
+              <div>Hello, I have added a few things into the user schema to support what I'm looking for. You can change/delete them if you need to.
 
                 <ul>
                   <li>
@@ -60,8 +60,8 @@ class ICO extends Component {
                       ETH:  user's erc20/223 token wallet address
                   </li>
                   </ul>
-              </p>
-                <p>
+              </div>
+                <div>
                   Task 1 - In Contribute payment form below, we have 3 figures we need
                   to calculate based on user input.
                   <ul>
@@ -89,8 +89,8 @@ class ICO extends Component {
                     <u>Total Tokens Received</u>. Shows Tokens Purchased + Bonus Tokens Received
                     </li>
                   </ul>
-                </p>
-                <p>
+                </div>
+                <div>
                   Task 2 - Since all submitted transactions start with 'pending'
                   status, we need a scheduler to process newly confirmed transactions
                   every X hours. This means that transactions should have a flag
@@ -105,7 +105,7 @@ class ICO extends Component {
                       We need a manual way to perform this as well within the admin page
                       </li>
                   </ul>
-                </p>
+                </div>
                 <p>
                   Task 3 - For CoinPayment transactions, insert '_blank href link' into the 'transaction created' message (the message right under payment button). The message is currently "A Transaction has been created please complete the transaction on the given address."  Change it to "Transaction created. <a href="javascript:void(0);">Please click here to proceed.</a>" The link will open a new page for user to proceed with payment.
                 </p>

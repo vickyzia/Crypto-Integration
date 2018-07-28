@@ -35,11 +35,12 @@ require('./config/passwort')(passport);
 
 const users = require('./routes/users');
 const payments = require('./routes/payments');
+const referrals = require('./routes/referrals');
 
 // use of routes
 app.use('/api/users', users);
 app.use('/api/payments', payments);
-
+app.use('/api/referrals', referrals);
 const port = process.env.PORT || 5000;
 
 app.get('/', (req, res) => res.send('hello'));

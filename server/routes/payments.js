@@ -13,7 +13,6 @@ const router = express.Router();
 const uuid = require('uuid/v4');
 const paymentConfigs = require('../config/payment-configs');
 const {confirmTransaction} = require('../utilities/payments-process'); 
-
 var Coinpayments = require('coinpayments');
 var coinPaymentsClient = new Coinpayments({
     key: '94850cce3d7bbd018077ecf3b8c89315c90836710f1ed4a16f64d1181567380d',
@@ -214,7 +213,7 @@ router.post('/transactionNotification', (req,res)=>{
             payment.transactionStatus = status;
             payment.transactionFee = data.fee;
             if(payment.transactionStatus == paymentStatus.completed)
-                payment.completedAt = Date.Now;
+                payment.completedAt = Date.now;
             Payment.update({ transactionId: payment.transactionId, _userId: payment._userId }, {
                 transactionStatus: status,
                 completedAt: payment.completedAt,
@@ -249,5 +248,3 @@ router.get('/loadUserPaymentInfo', validateToken, (req,res)=>{
     });
 });
 module.exports = router;
-
-

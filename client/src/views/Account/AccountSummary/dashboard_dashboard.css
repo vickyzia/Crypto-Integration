@@ -181,6 +181,10 @@
   font-weight: 700;
 }
 
+.payout_table{
+  overflow:auto;
+}
+
 /* Media Responsiveness */
 
 @media only screen and (max-width: 767px) {

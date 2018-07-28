@@ -26,7 +26,7 @@ class PayoutHistory extends Component{
                                 <td className="table-col-small">{payout.transactionId}</td>
                                 <td className="table-col-large">{payout.tokens}</td>
                                 <td className="table-col-medium">{payout.payoutStatus}</td>
-                                <td className="table-col-medium">{payout.createdAt}</td>    
+                                <td className="table-col-medium">{new Date(JSON.parse(JSON.stringify(payout.createdAt))).toLocaleString()}</td>   
                             </tr>
                         </React.Fragment>
                     ))

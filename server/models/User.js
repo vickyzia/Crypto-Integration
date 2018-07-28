@@ -32,6 +32,9 @@ const UserSchema = new Schema({
         type: String,
         default: ""
     },
+    lastUpdatedETH: {
+        type: Date
+    },
     date: {
         type: Date,
         default: Date.now
