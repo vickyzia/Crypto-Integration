@@ -53,6 +53,10 @@ class Referrals extends Component {
             <div className="bit_card_content">
               <div className="db_ref_section3_content">
                 <div className="db_ref_flex_row">
+                    <div className="db_ref_card_left3">Referral Code:</div>
+                    <div className="db_ref_card_right3">{this.props.refcode == ''? 'N/A':this.props.refcode}</div>
+                  </div>
+                <div className="db_ref_flex_row">
                   <div className="db_ref_card_left3">Current Sponsor:</div>
                   <div className="db_ref_card_right3">{this.props.sponsor == ''? 'N/A':this.props.sponsor}</div>
                 </div>
@@ -88,7 +92,8 @@ Referrals.propTypes = {
   levelOneReferrals: PropTypes.number.isRequired,
   levelTwoReferrals: PropTypes.number.isRequired,
   levelThreeReferrals: PropTypes.number.isRequired,
-  loadReferralData : PropTypes.func.isRequired
+  loadReferralData : PropTypes.func.isRequired,
+  refcode: PropTypes.string.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -96,7 +101,8 @@ const mapStateToProps = state => ({
   referralBonusEarned:state.referrals.referralBonusEarned,
   levelOneReferrals: state.referrals.levelOneReferrals,
   levelTwoReferrals: state.referrals.levelTwoReferrals,
-  levelThreeReferrals: state.referrals.levelThreeReferrals
+  levelThreeReferrals: state.referrals.levelThreeReferrals,
+  refcode: state.referrals.refcode
 });
 
 export default connect(

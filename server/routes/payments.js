@@ -27,32 +27,32 @@ router.post('/createTransaction',validateToken, (req,res)=>{
         return res.status(400).json(errors);
     }
     Payment.findOne({transactionId: data.transactionId})
-            .then(payment=>{
-                if(payment && payment.paymentType == data.paymentType){
-                    errors.transactionId = 'Transaction with this id already exists';
-                    return res.status(400).json(errors)
-                }
-                var newPayment;
-                Wallet.findOne({publicKey:data.toAddress})
-                    .then(wallet=>{
-                        if(wallet){
-                            newPayment = createPaymentObject(data);
-                            newPayment.save()
-                            .then(payment=>{
-                                return res.status(200).json(payment);
-                            })
-                            .catch(err=>{
-                                console.log(err);
-                                errors.message = "Unable to create transaction at the moment."
-                                return res.status(500).json(errors);
-                            });
-                        }else{
-                            errors.toAddress = 'Invalid Address for payment to send to.';
-                            return res.status(400).json(errors)
-                        }
-                    });
-                
-            });
+        .then(payment=>{
+            if(payment && payment.paymentType == data.paymentType){
+                errors.transactionId = 'Transaction with this id already exists';
+                return res.status(400).json(errors)
+            }
+            var newPayment;
+            Wallet.findOne({publicKey:data.toAddress})
+                .then(wallet=>{
+                    if(wallet){
+                        newPayment = createPaymentObject(data);
+                        newPayment.save()
+                        .then(payment=>{
+                            return res.status(200).json(payment);
+                        })
+                        .catch(err=>{
+                            console.log(err);
+                            errors.message = "Unable to create transaction at the moment."
+                            return res.status(500).json(errors);
+                        });
+                    }else{
+                        errors.toAddress = 'Invalid Address for payment to send to.';
+                        return res.status(400).json(errors)
+                    }
+                });
+            
+        });
 });
 
 function createPaymentObject(data){

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
+const userRoles = require('../config/roles');
 // create schema
 const UserSchema = new Schema({
     email: {
@@ -28,6 +28,10 @@ const UserSchema = new Schema({
         type: Number,
         default: 0
     },
+    hftPendingBal:{
+        type:Number,
+        default:0
+    },
     ETH: {
         type: String,
         default: ""
@@ -42,6 +46,14 @@ const UserSchema = new Schema({
     isVerified: { 
         type: Boolean,
         default: false
+    },
+    role: {
+        type:Number,
+        default: userRoles.User
+    },
+    isEnabled: {
+        type:Boolean,
+        default: true
     }
 });
 

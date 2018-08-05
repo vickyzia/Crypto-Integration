@@ -6,6 +6,7 @@ import isEmpty from '../validations/is-empty';
 
 const initialState = {
     sponsor: '', 
+    refcode: '',
     referralBonusEarned:0,
     levelOneReferrals: 0,
     levelTwoReferrals: 0,
@@ -19,6 +20,7 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 sponsor: action.payload.sponsor, 
+                refcode: action.payload.refcode,
                 referralBonusEarned:action.payload.referralBonusEarned,
                 levelOneReferrals: action.payload.levelOneReferrals,
                 levelTwoReferrals: action.payload.levelTwoReferrals,

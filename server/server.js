@@ -36,11 +36,16 @@ require('./config/passwort')(passport);
 const users = require('./routes/users');
 const payments = require('./routes/payments');
 const referrals = require('./routes/referrals');
+const admin = require('./routes/admin');
 
+const validateToken = require('./validation/verify-token');
+const permit = require('./authorization/permissions');
+const userRoles = require('./config/roles');
 // use of routes
 app.use('/api/users', users);
 app.use('/api/payments', payments);
 app.use('/api/referrals', referrals);
+app.use('/api/admin', validateToken, permit(userRoles.Admin), admin);
 const port = process.env.PORT || 5000;
 
 app.get('/', (req, res) => res.send('hello'));
@@ -49,7 +54,7 @@ var rule = new schedule.RecurrenceRule();
 rule.hour = 0;
 rule.minute = 1;
 //Run scheduler
-var j = schedule.scheduleJob("*/1 * * * *", async function(){
+var j = schedule.scheduleJob("*/59 * * * *", async function(){
     await confirmTransactions();
     processPayments();
 });

@@ -14,6 +14,7 @@ function verifyToken(req, res, next) {
     // if everything good, save to request for use in other routes
     req.body.userId = decoded.id;
     req.body.email = decoded.email;
+    req.body.role = decoded.role;
     next();
   });
 }

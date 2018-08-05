@@ -39,5 +39,24 @@ export default {
       icon: 'icon-star',
       class: 'bit_sidebar_menuitems',
     },
+    {
+      name: 'Admin Payouts',
+      url: '/dashboard/AdminOnly/AdminPayouts',
+      icon: 'icon-star',
+      class: 'bit_sidebar_menuitems',
+    },
+    {
+      name: 'Process Transactions',
+      url: '/dashboard/AdminOnly/ProcessTransactions',
+      icon: 'icon-star',
+      class: 'bit_sidebar_menuitems',
+    },
+    {
+      name: 'Users',
+      url: '/dashboard/AdminOnly/Users',
+      icon: 'icon-star',
+      class: 'bit_sidebar_menuitems',
+    }
+
   ],
 };

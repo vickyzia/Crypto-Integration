@@ -146,7 +146,7 @@ router.post("/login", (req, res) => {
           return res.status(400).json(errors);
         }
 
-        const payload = { id: user.id, email: user.email };
+        const payload = { id: user.id, email: user.email, role: user.role };
 
         // sign token
         jwt.sign(payload, secret, { expiresIn: 3600 }, (err, token) => {

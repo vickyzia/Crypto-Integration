@@ -26,7 +26,6 @@ module.exports={
             else{
                 if(payments!=null){
                     payments.forEach(payment => {
-                        let totalTokens = payment.tokens + payment.bonusTokens;
                         User.findById(payment._userId).then(async user=>{
                             module.exports.updateBalanceAndCreatePayout(user,payment)
                                 .then(results => {
@@ -50,27 +49,27 @@ module.exports={
             var task = Fawn.Task();
             task.update("users",{_id:user._id},{hftBal: user.hftBal+tokens+bonusTokens});
             task.save("payouts", {tokens: tokens+ bonusTokens,transactionId:payment.transactionId, 
-                payoutType: payoutTypes.Purchase, payoutStatus: payoutStatuses.AddedToUserAccount, _userId: user._id, 
+                payoutType: payoutTypes.Purchase, payoutStatus: payoutStatuses.Paid, _userId: user._id, 
                 createdAt:Date.now()});
             if(referrals.referralLevelOne){
                 task.update("users",{_id:referrals.referralLevelOne._id},
                     {hftBal: referrals.referralLevelOne.hftBal + (tokens * 0.10)});
                 task.save("payouts", {tokens: tokens*0.10,transactionId:user.email, 
-                    payoutType: payoutTypes.ReferralLevelOne, payoutStatus: payoutStatuses.AddedToUserAccount, 
+                    payoutType: payoutTypes.ReferralLevelOne, payoutStatus: payoutStatuses.Paid, 
                         _userId: referrals.referralLevelOne._id, createdAt:Date.now() });
             }
             if(referrals.referralLevelTwo){
                 task.update("users",{_id:referrals.referralLevelTwo._id},
                     {hftBal: referrals.referralLevelTwo.hftBal + (tokens * 0.05)});
                 task.save("payouts", {tokens: tokens*0.05,transactionId:user.email, 
-                    payoutType: payoutTypes.ReferralLevelTwo, payoutStatus: payoutStatuses.AddedToUserAccount,
+                    payoutType: payoutTypes.ReferralLevelTwo, payoutStatus: payoutStatuses.Paid,
                     _userId: referrals.referralLevelTwo._id, createdAt:Date.now()});
             }
             if(referrals.referralLevelThree){
                 task.update("users",{_id:referrals.referralLevelThree._id},
                     {hftBal: referrals.referralLevelThree.hftBal + (tokens * 0.03)});
                 task.save("payouts", {tokens: tokens*0.03,transactionId:user.email, 
-                    payoutType: payoutTypes.ReferralLevelThree, payoutStatus: payoutStatuses.AddedToUserAccount,
+                    payoutType: payoutTypes.ReferralLevelThree, payoutStatus: payoutStatuses.Paid,
                     _userId: referrals.referralLevelThree._id,createdAt:Date.now()});
             }
             task.update("payments", {_id:payment._id},{isProcessed:true});
@@ -154,7 +153,7 @@ module.exports={
             web3Http.eth.getTransactionReceipt(payment.transactionId, function (error, result) {
                 if (!error && result) {
                     var status = paymentStatus.pending;
-                    status = result.status == "0x1" ? paymentStatus.completed
+                    status = result.status == true ? paymentStatus.completed
                         : paymentStatus.cancelled;
                     payment.transactionStatus = status;
                     Payment.update({ transactionId: payment.transactionId, _userId: payment._userId }, {
@@ -191,5 +190,18 @@ module.exports={
                 }
             });
         });
-    }
+    },
+    confirmBlockchainTransaction(transaction) {
+        return new Promise((resolve, reject)=>{
+            let web3Http = new Web3(new Web3.providers.HttpProvider(paymentConfigs.ETHEREUM_NETWORK));
+            web3Http.eth.getTransactionReceipt(transaction.transactionId, function (error, result) {
+                var status = paymentStatus.pending;
+                if (!error && result) {
+                    status = result.status == true ? paymentStatus.completed
+                        : paymentStatus.cancelled;
+                }
+                return resolve(status);
+            });}
+        );
+    },
 }

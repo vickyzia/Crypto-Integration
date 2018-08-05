@@ -30,16 +30,16 @@ router.get('/referralInfo',validateToken,(req,res)=>{
                 }
                 User.find({sponsor: user.refcode},{refcode:true}).then(ref1=>{
                     if(!ref1 || ref1.length == 0){
-                        return res.status(200).json(getReferralResult(sponsor,referralBonusEarned,0,0,0));
+                        return res.status(200).json(getReferralResult(sponsor,referralBonusEarned,0,0,0,user.refcode));
                     }
                     let levelOneReferralCodes = ref1.map( r=> r.refcode);
                     User.find({sponsor: { $in : levelOneReferralCodes}},{refcode:true}).then(ref2 =>{
                         if(!ref2 || ref2.length == 0){
-                            return res.status(200).json(getReferralResult(sponsor,referralBonusEarned,ref1.length,0,0));
+                            return res.status(200).json(getReferralResult(sponsor,referralBonusEarned,ref1.length,0,0,user.refcode));
                         }
                         let levelTwoReferralCodes = ref2.map( r=> r.refcode);
                         User.find({sponsor: { $in : levelTwoReferralCodes}},{refcode:true}).then(ref3 =>{
-                            return res.status(200).json(getReferralResult(sponsor,referralBonusEarned,ref1.length,ref2.length,ref3.length));
+                            return res.status(200).json(getReferralResult(sponsor,referralBonusEarned,ref1.length,ref2.length,ref3.length,user.refcode));
                         }).catch(err=>{
                             console.log(err);
                             errors.message = err;
@@ -64,9 +64,10 @@ router.get('/referralInfo',validateToken,(req,res)=>{
     });
 });
 
-function getReferralResult(sponsor,referralBonusEarned,levelOneReferrals,levelTwoReferrals,levelThreeReferrals){
+function getReferralResult(sponsor,referralBonusEarned,levelOneReferrals,levelTwoReferrals,levelThreeReferrals,refcode){
     return {
         sponsor: sponsor, 
+        refcode: refcode,
         referralBonusEarned:referralBonusEarned,
         levelOneReferrals: levelOneReferrals,
         levelTwoReferrals: levelTwoReferrals,

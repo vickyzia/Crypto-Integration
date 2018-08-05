@@ -38,6 +38,21 @@ const AdminOnly = Loadable({
   loading: Loading,
 });
 
+const AdminPayouts = Loadable({
+  loader: () => import('./views/AdminOnly/AdminPayout/admin-payout'),
+  loading: Loading,
+});
+
+const ProcessTransactions = Loadable({
+  loader: () => import('./views/AdminOnly/ProcessPayment/PaymentList'),
+  loading: Loading,
+});
+
+const UserList = Loadable({
+  loader: () => import('./views/AdminOnly/users/user-list'),
+  loading: Loading,
+});
+
 
 
 
@@ -48,7 +63,10 @@ const routes = [
   { path: '/dashboard/Account/AccountSummary', name: 'User Dashboard', component: AccountSummary },
   { path: '/dashboard/Account/AccountSettings', name: 'Account Settings', component: AccountSettings },
   { path: '/dashboard/Other/Referrals', name: 'Referral Network', component: Referrals },
-  { path: '/dashboard/AdminOnly', name: 'Admin Only Page', component: AdminOnly }
+  { path: '/dashboard/AdminOnly/AdminPayouts', name: 'Admin Payouts', component: AdminPayouts},
+  { path: '/dashboard/AdminOnly/ProcessTransactions', name: 'Process Transactions', component: ProcessTransactions},
+  { path: '/dashboard/AdminOnly/Users', name: 'Users', component: UserList},
+  { path: '/dashboard/AdminOnly', name: 'Admin Only Page', component: AdminOnly },
 ];
 
 export default routes;

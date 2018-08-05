@@ -20,11 +20,12 @@ export const loadReferralData = () => dispatch =>{
             }
         );
 };
-export const loadReferralDataCreator = ({sponsor, referralBonusEarned, levelOneReferrals,levelTwoReferrals,levelThreeReferrals}) => {
+export const loadReferralDataCreator = ({sponsor, referralBonusEarned, levelOneReferrals,levelTwoReferrals,levelThreeReferrals,refcode}) => {
     return {
         type: LOAD_REFERRAL_DATA,
         payload: {
-            sponsor: sponsor, 
+            sponsor: sponsor,
+            refcode,refcode,
             referralBonusEarned:referralBonusEarned,
             levelOneReferrals: levelOneReferrals,
             levelTwoReferrals: levelTwoReferrals,
