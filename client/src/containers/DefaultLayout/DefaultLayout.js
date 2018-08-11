@@ -65,7 +65,6 @@ onLogoutClick(e) {
             <Container fluid>
               <Switch>
                 {routes.map((route, idx) => {
-                  console.log(route);
                     return route.component ? (<Route key={idx} path={route.path} exact={route.exact} name={route.name} render={props => (
                         <route.component {...props} />
                       )} />)

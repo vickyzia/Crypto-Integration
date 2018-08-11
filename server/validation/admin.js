@@ -6,7 +6,7 @@ module.exports ={
     validateSendTokenObject : (data) => {
         let errors = {};
         data.userEmail = !isEmpty(data.userEmail)? data.userEmail : "";
-        data.tokenAmount = !isEmpty(data.tokenAmount)? data.tokenAmount : 0;
+        data.tokenAmount = !isEmpty(data.tokenAmount)? Number(data.tokenAmount) : 0;
 
         if(data.tokenAmount == 0){
             errors.tokenAmount = "Ammount cannot be 0";

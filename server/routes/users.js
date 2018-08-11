@@ -136,6 +136,9 @@ router.post("/login", (req, res) => {
       errors.email = "Invalid email or password";
       return res.status(404).json(errors);
     }
+    if(!user.isEnabled){
+      return res.status(403).json("Your account is disabled");
+    }
     // check password
     bcrypt.compare(password, user.password).then(isMatch => {
       if (isMatch) {
@@ -182,7 +185,9 @@ router.post("/change-password",validateToken, (req, res) => {
       errors.changepwemail = "User email not found!";
       return res.status(404).json(errors);
     }
-
+    if(!user.isEnabled){
+      return res.status(403).json("Your account is disabled");
+    }
     bcrypt.compare(currentPassword, user.password).then(isMatch => {
       if (isMatch) {
         bcrypt.genSalt(10, (err, salt) => {

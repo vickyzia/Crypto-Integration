@@ -12,10 +12,10 @@ module.exports = validateUpdateWalletInput = data => {
     if (Validator.isEmpty(data.wallet)) {
         errors.wallet = 'Wallet address is required!';
     }
-    if(web3Http.utils.isAddress(data.wallet)){
+    if(!web3Http.utils.isAddress(data.wallet)){
         errors.wallet = 'Invalid Address';
     }
-    return {
+    return {    
         errors,
         isValid: isEmpty(errors)
     };

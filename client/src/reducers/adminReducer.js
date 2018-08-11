@@ -7,17 +7,22 @@ import {
     ADMIN_PROCESS_TRANSACTION,
     ADMIN_USERS_IS_LOADING,
     ADMIN_LOAD_USERS,
-    ADMIN_UPDATE_USER
+    ADMIN_UPDATE_USER,
+    ADMIN_LOAD_BLOCKCHAIN_TRANSACTIONS,
+    ADMIN_IS_BLOCKCHAIN_TRANSACTIONS_LOADING,
+    ADMIN_CONFIRM_TRANSACTION
 } from '../actions/types';
 
 const initialState = {
     isPayoutLoading: false,
     payoutList: [],
     unprocessedTransactions: [],
-    isTransactionsLoading: false,
+    isUnprocessedTransactionsLoading: false,
     isAuthorized: true,
     users: [],
-    isLoadingUsers: false
+    isLoadingUsers: false,
+    blockchainTransactionList: [],
+    isLoadingBlockchainTransactions : false
 };
 
 export default function (state = initialState, action) {
@@ -40,7 +45,7 @@ export default function (state = initialState, action) {
         case ADMIN_IS_TRANSACTIONS_LOADNG:
             return {
                 ...state,
-                isTransactionsLoading: action.payload.isLoading
+                isUnprocessedTransactionsLoading: action.payload.isLoading
             }
         case ADMIN_AUTHORIZATION:
             return {
@@ -71,6 +76,24 @@ export default function (state = initialState, action) {
                 users: state.users.map(
                     user => user._id.toString() == action.payload.user._id.toString()?
                         {...user,isUpdatng:action.payload.isUpdating}:user)
+            }
+        case ADMIN_LOAD_BLOCKCHAIN_TRANSACTIONS:
+            console.log(action.payload.transactionList);
+            return {
+                ...state,
+                blockchainTransactionList: action.payload.transactionList
+            }
+        case ADMIN_IS_BLOCKCHAIN_TRANSACTIONS_LOADING:
+            return {
+                ...state,
+                isLoadingBlockchainTransactions: action.payload.isLoading
+            }
+        case ADMIN_CONFIRM_TRANSACTION:
+            return{
+                ...state,
+                blockchainTransactionList:state.blockchainTransactionList.map(
+                    transaction => transaction.transactionId == action.payload.transactionId?
+                        {...transaction,isUpdating:action.payload.isUpdating}:transaction )
             }
         default:
             return state;

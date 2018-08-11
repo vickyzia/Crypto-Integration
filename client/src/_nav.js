@@ -52,8 +52,14 @@ export default {
       class: 'bit_sidebar_menuitems',
     },
     {
-      name: 'Users',
-      url: '/dashboard/AdminOnly/Users',
+      name: 'Blockchain Manager',
+      url: '/dashboard/AdminOnly/BlockchainManager',
+      icon: 'icon-star',
+      class: 'bit_sidebar_menuitems',
+    },
+    {
+      name: 'Blockchain Transactions',
+      url: '/dashboard/AdminOnly/BlockchainTransactions',
       icon: 'icon-star',
       class: 'bit_sidebar_menuitems',
     }

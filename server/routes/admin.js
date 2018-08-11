@@ -11,6 +11,8 @@ var payoutStatuses = require('../config/payout-status');
 var paymentStatuses = require('../config/transaction-status');
 var paymentProcess = require('../utilities/payments-process');
 const Fawn = require('fawn');
+const {confirmBlockchainTransaction} = require('../utilities/payments-process')
+
 router.post('/sendUserTokens', (req,res)=>{
     const {errors, isValid} = adminValidations.validateSendTokenObject(req.body);
     var data = req.body;
@@ -101,7 +103,7 @@ router.post('/processPayment', (req,res)=>{
 });
 
 router.post('/createTransaction', (req,res)=>{
-    const {errors, isValid} = adminValidations.validateProcessPaymentData(req.body);
+    const {errors, isValid} = adminValidations.validateTransactionInput(req.body);
     if (!isValid) {
         return res.status(400).json(errors);
     }
@@ -115,7 +117,7 @@ router.post('/createTransaction', (req,res)=>{
             User.findOne({email:data.userEmail})
                 .then(user=>{
                     let task = Fawn.Task();
-                    task.save("blockchainTransactions",{_userId: user._id, transactionId:data.transactionId, tokens:data.tokens,
+                    task.save("blockchaintransactions",{_userId: user._id, transactionId:data.transactionId, tokens:data.tokens,
                         fromAddress: data.fromAddress, toAddress:data.toAddress, createdAt: Date.now(),
                         trasnsactionStatus: paymentStatuses.pending
                     }); 
@@ -148,17 +150,18 @@ router.post('/confirmTransaction', (req,res) => {
                 errors.transactionId = "Transaction Id doesn't exist";
                 return res.status(400).json(errors);
             }
-            if(payment.transactionStatus == paymentStatus.cancelled ||
-                payment.transactionStatus == paymentStatus.completed){
+            if(payment.transactionStatus == paymentStatuses.cancelled ||
+                payment.transactionStatus == paymentStatuses.completed){
                 return res.status(200).json(payment);
             }
-            confirmTransaction(payment).then(res=>{
+            confirmBlockchainTransaction(payment).then(tranactionResult=>{
                 User.findOne({_id:payment._userId}).then(user=>{
+                    let tokens = payment.tokens;
                     const task = Fawn.Task();
-                    if(res == paymentStatuses.pending){
-                        return res.status(200).json(payment);
+                    if(tranactionResult == paymentStatuses.pending){
+                        return tranactionResult.status(200).json(payment);
                     }
-                    if(res == paymentStatuses.completed){
+                    if(tranactionResult == paymentStatuses.completed){
                         user.hftPendingBal  -= tokens;
                         user.hftBlockchainSent += tokens; 
                     }
@@ -167,16 +170,16 @@ router.post('/confirmTransaction', (req,res) => {
                     }
                     task.update("users",{_id:user._id},{hftPendingBal : user.hftPendingBal,
                          hftBlockchainSent: user.hftBlockchainSent});
-                    task.update("blockchainTransactions",{_id:payment._id},{trasnsactionStatus: res});
+                    task.update("blockchaintransactions",{_id:payment._id},{transactionStatus: tranactionResult});
                     task.run().then(results=>{
                         return res.status(200).json(payment);
                     }).then(err=>{
-
+                        return res.status(500).json("Error in confirmation");
                     });
                 }).catch(err=>{
                     console.log(err);
                     errors.err = "Unable to confirming transaction at the moment."
-                    return res.status(500).json(errors);
+                    return tranactionResult.status(500).json(errors);
                 });
 
             });
@@ -199,7 +202,7 @@ router.get('/users', (req,res)=>{
 });
 
 router.get('/blockchainTransactions', (req,res)=>{
-    BlockchainTransaction.find({}).then(transactions=>{
+    BlockchainTransaction.find({},).then(transactions=>{
         return res.status(200).json(transactions);
     }).catch(err=>{
         let errors = {};

@@ -39,5 +39,5 @@ const BlockchainTransactionSchema = new mongoose.Schema({
     }
 });
 
-module.exports = BlockchainTransaction = mongoose.model('blockchainTransactions', 
+module.exports = BlockchainTransaction = mongoose.model('blockchaintransactions', 
     BlockchainTransactionSchema);

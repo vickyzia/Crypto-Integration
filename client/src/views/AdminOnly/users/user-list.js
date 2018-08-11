@@ -34,7 +34,13 @@ class UserList extends Component{
                                 <td className="table-col-medium">{user.hftPendingBal}</td>
                                 <td className="table-col-medium">
                                     <button onClick={this.onUpdateClick.bind(this, user)} disabled={user.isUpdating}>{user.isEnabled?"Disable":"Enable"}</button>
-                                </td>                            
+                                </td>
+                                {(user.hftBal - user.hftBlockchainSent)>0 && 
+                                <td className="table-col-medium">
+                                {console.log(this.props.enableSendTokens)}
+                                    <button onClick={()=>this.props.sendTokens(user)} disabled={user.hftBlockchainSent>=(user.hftBal+user.hftPendingBal) || !this.props.enableSendTokens}>Send Tokens</button>
+                                </td>
+                            }                          
                             </tr>
                         </React.Fragment>
                     ))

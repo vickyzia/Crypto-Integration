@@ -48,8 +48,13 @@ const ProcessTransactions = Loadable({
   loading: Loading,
 });
 
-const UserList = Loadable({
-  loader: () => import('./views/AdminOnly/users/user-list'),
+const BlockchainPaymentManager = Loadable({
+  loader: () => import('./views/AdminOnly/users/BlockchainPaymentManager'),
+  loading: Loading,
+});
+
+const BlockchainTransactions = Loadable({
+  loader: () => import('./views/AdminOnly/BlockchainTransactionList/blockchainTransactionList'),
   loading: Loading,
 });
 
@@ -65,7 +70,8 @@ const routes = [
   { path: '/dashboard/Other/Referrals', name: 'Referral Network', component: Referrals },
   { path: '/dashboard/AdminOnly/AdminPayouts', name: 'Admin Payouts', component: AdminPayouts},
   { path: '/dashboard/AdminOnly/ProcessTransactions', name: 'Process Transactions', component: ProcessTransactions},
-  { path: '/dashboard/AdminOnly/Users', name: 'Users', component: UserList},
+  { path: '/dashboard/AdminOnly/BlockchainManager', name: 'Blockchain Manager', component: BlockchainPaymentManager},
+  { path: '/dashboard/AdminOnly/BlockchainTransactions', name: 'Blockchain Transactions', component:BlockchainTransactions},
   { path: '/dashboard/AdminOnly', name: 'Admin Only Page', component: AdminOnly },
 ];
 

@@ -19,10 +19,10 @@ import {
 } from './types';
 import {getAccounts} from '../utils/metaMask'
 
-export const loadComplete = (paymentData) => dispatch => {
+export const loadComplete = (paymentData, loadPaymentData = true) => dispatch => {
     if(window.web3){
         let netId = window.web3.version.network != undefined?  Number(window.web3.version.network):-1;
-        if(netId != -1 && !paymentData){
+        if(netId != -1 && !paymentData && loadPaymentData){
             console.log("Loading Payment");
             axios
             .get(BASE_URL+'/api/payments/loadPaymentData')
