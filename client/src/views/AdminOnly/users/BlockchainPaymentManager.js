@@ -129,16 +129,17 @@ class BlockchainPaymentManager extends React.Component{
           tokens: this.state.amountToSend,
           userEmail: this.state.userEmail
         };
-        createHFTTransaction(transactionObject, this.transactionCallback)
+        createHFTTransaction(transactionObject, this.transactionCallback);
         this.setState({
           currentTransactionObject: transactionObject
         });
       }
       transactionCallback(error, txHash){
         if(error){
+          console.log(error);
           this.setState({
-            error:error,
-            transactionObject:null
+            error:error.message,
+            currentTransactionObject:null
           });
         }
         else{

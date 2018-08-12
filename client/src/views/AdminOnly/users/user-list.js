@@ -37,7 +37,6 @@ class UserList extends Component{
                                 </td>
                                 {(user.hftBal - user.hftBlockchainSent)>0 && 
                                 <td className="table-col-medium">
-                                {console.log(this.props.enableSendTokens)}
                                     <button onClick={()=>this.props.sendTokens(user)} disabled={user.hftBlockchainSent>=(user.hftBal+user.hftPendingBal) || !this.props.enableSendTokens}>Send Tokens</button>
                                 </td>
                             }                          

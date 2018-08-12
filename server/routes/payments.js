@@ -13,8 +13,8 @@ const router = express.Router();
 const uuid = require('uuid/v4');
 const paymentConfigs = require('../config/payment-configs');
 const {confirmTransaction} = require('../utilities/payments-process'); 
-var Coinpayments = require('coinpayments');
-var coinPaymentsClient = new Coinpayments({
+const Coinpayments = require('coinpayments');
+const coinPaymentsClient = new Coinpayments({
     key: '94850cce3d7bbd018077ecf3b8c89315c90836710f1ed4a16f64d1181567380d',
     secret: 'f73f21154c9f00A19DF62C3EA63d1f834aD42afa5c46DeB25f858Cf4F1576Fd9'
   }); 
@@ -126,6 +126,8 @@ router.get('/loadPaymentData',validateToken, async (req,res)=>{
                 return res.status(500).json(errors);
             }
             payload.wallets = wallets;
+            if(wallets.length == 0)
+                payload.wallets = [{publicKey: paymentConfigs.DEFAULT_WALLET }];
             return res.status(200).json(payload);
         });
     }

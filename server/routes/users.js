@@ -137,7 +137,8 @@ router.post("/login", (req, res) => {
       return res.status(404).json(errors);
     }
     if(!user.isEnabled){
-      return res.status(403).json("Your account is disabled");
+      errors.email = "Your account is disabled";
+      return res.status(403).json(errors);
     }
     // check password
     bcrypt.compare(password, user.password).then(isMatch => {
