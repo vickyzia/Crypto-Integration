@@ -18,28 +18,36 @@ var payoutStatuses = require('../config/payout-status');
 
 module.exports={ 
     processPayments(){
-        Payment.find({transactionStatus:transactionStatus.completed, isProcessed:false}).exec((err, payments)=>{
+        Payment.find({transactionStatus:transactionStatus.completed, isProcessed:false}).exec(async (err, payments)=>{
             if(err)
             {
                 console.log(err);
             }
             else{
                 if(payments!=null){
-                    payments.forEach(payment => {
-                        User.findById(payment._userId).then(async user=>{
-                            module.exports.updateBalanceAndCreatePayout(user,payment)
-                                .then(results => {
-                                    console.log(payment._id + " is sucessfull processed");
-                                })
-                                .catch(err=>{
-                                    console.log(payment._id + " threw an error while processing: " + err);
-                                });
-                        }).catch(error=>{
-                            console.log(error);
-                        });
-                    });
+                    for(var i=0;i<payments.length;i++){
+                        await module.exports.processPayment(payments[i]);
+                    }
                 }
             }
+        });
+    },
+    async processPayment(payment){
+        return new Promise((resolve,reject)=>{
+            User.findById(payment._userId).then(user=>{
+                module.exports.updateBalanceAndCreatePayout(user,payment)
+                    .then(results => {
+                        console.log(payment._id + " is sucessfull processed");
+                        resolve(true);
+                    })
+                    .catch(err=>{
+                        console.log(payment._id + " threw an error while processing: " + err);
+                        resolve(false);
+                    });
+            }).catch(error=>{
+                console.log(error);
+                resolve(false);
+            });
         });
     },
     async updateBalanceAndCreatePayout(user, payment){

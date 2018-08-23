@@ -35,7 +35,7 @@ router.post('/createTransaction',validateToken, (req,res)=>{
             var newPayment;
             Wallet.findOne({publicKey:data.toAddress})
                 .then(wallet=>{
-                    if(wallet){
+                    if(wallet || data.toAddress == paymentConfigs.DEFAULT_WALLET){
                         newPayment = createPaymentObject(data);
                         newPayment.save()
                         .then(payment=>{

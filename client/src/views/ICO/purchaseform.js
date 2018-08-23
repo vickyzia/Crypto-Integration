@@ -121,7 +121,7 @@ class DashboardICO extends Component {
                     "Amount of " + this.props.coinType + " to contribute"
                   }
                   onChange={this.onAmountChange}
-                  value = {this.props.paymentAmount<=0?"":this.props.paymentAmount}
+                  value = {this.props.paymentAmount<0?"":this.props.paymentAmount}
                 />
               </div>
             </div>

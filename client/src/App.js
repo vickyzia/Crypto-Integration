@@ -5,7 +5,7 @@ import uparrow from "./assets/up-arrow.png";
 import { Link } from "react-router-dom";
 import ScrollUpButton from "react-scroll-up-button";
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route,Switch } from "react-router-dom";
 import {Redirect} from "react-router-dom";
 import { Provider } from 'react-redux';
 import store from './store';
@@ -14,6 +14,8 @@ import setAuthToken from './utils/setAuthToken';
 import { setCurrentUser, logoutUser } from './actions/authActions';
 import Confirmation from "./components/Confirmation/confirmation";
 import AfterRegister from "./components/AfterRegister/after-register";
+import ForgotPassword from "./components/ForgotPassword/forgot-password";
+import ResetPassword from "./components/ResetPassword/reset-password";
 import { DefaultLayout } from './containers';
 // CoreUI Icons Set
 import '@coreui/icons/css/coreui-icons.min.css';
@@ -52,14 +54,18 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
+
         <Router>
-          <div>
+          <Switch>
             <Route exact path="/login" component={Login} />
+            <Route exact path="/forgot-password" component={ForgotPassword}/>
             <Route exact path="/confirmation/:token" component={Confirmation} />
+            <Route exact path="/reset-password/:tokenData/:token" component={ResetPassword}/>
             <Route exact path="/after-register" component={AfterRegister} />
             <Route path="/dashboard" component={DefaultLayout} />
+            <Route exact path="/" component={Login} />
             <Redirect from="/" to="/login" />
-          </div>
+          </Switch>
         </Router>
       </Provider>
     );

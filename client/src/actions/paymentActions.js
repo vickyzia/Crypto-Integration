@@ -20,26 +20,26 @@ import {
 import {getAccounts} from '../utils/metaMask'
 
 export const loadComplete = (paymentData, loadPaymentData = true) => dispatch => {
+    var netId = -1;
     if(window.web3){
-        let netId = window.web3.version.network != undefined?  Number(window.web3.version.network):-1;
-        if(netId != -1 && !paymentData && loadPaymentData){
-            console.log("Loading Payment");
-            axios
-            .get(BASE_URL+'/api/payments/loadPaymentData')
-            .then(res => {
-                dispatch(loadCompleteActionCreator(netId,res.data,getAccounts()));
-            })
-            .catch(err =>
-                {
-                    
-                }
-            );
-        }     
-        else{
-            //TODO: Only dispatch if there is an update.
-            dispatch(loadCompleteActionCreator(netId,paymentData,getAccounts()));
-        }   
+        netId = window.web3.version.network != undefined?  Number(window.web3.version.network):-1;
     }
+    if(!paymentData && loadPaymentData){
+        axios
+        .get(BASE_URL+'/api/payments/loadPaymentData')
+        .then(res => {
+            dispatch(loadCompleteActionCreator(netId,res.data,getAccounts()));
+        })
+        .catch(err =>
+            {
+                
+            }
+        );
+    }     
+    else{
+        //TODO: Only dispatch if there is an update.
+        dispatch(loadCompleteActionCreator(netId,paymentData,getAccounts()));
+    } 
 };
 
 

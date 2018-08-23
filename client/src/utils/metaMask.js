@@ -31,7 +31,7 @@ export const createTransaction = ({fromAddress, toAddress, amount}, callback) =>
                 value: window.web3.toWei(amount,'ether'),
                 gasPrice: gasPrice.toString()
             },callback);
-        })
+        });
 
         return true;
     }
@@ -45,10 +45,14 @@ export const createHFTTransaction = ({toAddress, tokens}, callback) =>{
         let amount = web3js.toBigNumber(tokens);
         console.log(contract);
         let value = amount.times(web3js.toBigNumber(10).pow(decimals));
-        console.log(toAddress);
         // call transfer function
         web3js.eth.defaultAccount=web3js.eth.accounts[0];
-        contract.transfer(toAddress, value, callback);
+        web3js.eth.getGasPrice((error,result)=>{
+            if(error)
+                return false;
+            let gasPrice = new Number(result);
+            contract.transfer(toAddress, value,{gasPrice:gasPrice, gas:210000}, callback);
+        });
     }
 }
 export const getHFTABI = ()=>{

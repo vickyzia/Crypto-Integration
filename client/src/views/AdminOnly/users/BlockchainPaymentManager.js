@@ -46,7 +46,7 @@ class BlockchainPaymentManager extends React.Component{
         this.setState({amountToSend: amountToSend});
     }
     componentDidMount(){
-      this.loadInterval = setInterval(this.props.loadComplete(null, false),10000);
+      this.loadInterval = setInterval(this.props.loadComplete(this.props.paymentData, false),10000);
     }
     componentWillUnmount(){
       clearInterval(this.loadInterval);
@@ -161,6 +161,7 @@ BlockchainPaymentManager.propTypes = {
   loadComplete: PropTypes.func.isRequired,
   createBlockchainTransaction: PropTypes.func.isRequired,
   metaMaskAccounts: PropTypes.array,
+  paymentData : PropTypes.object
 };
 
 
@@ -168,6 +169,7 @@ const mapStateToProps = state => ({
   isLoading: state.payment.isLoading,
   networkId: state.payment.networkId,
   metaMaskAccounts: state.payment.metamaskAccounts,
+  paymentData:state.payment.paymentData
 });
 
 export default connect(mapStateToProps,{loadComplete:loadComplete, createBlockchainTransaction:createBlockchainTransactionOnAPI}) (BlockchainPaymentManager);

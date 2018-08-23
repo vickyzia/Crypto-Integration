@@ -15,9 +15,13 @@ const validateRegisterInput = require("../validation/register");
 const validateLoginInput = require("../validation/login");
 const validateChangePasswordInput = require("../validation/change-password");
 const validateUpdateWalletInput = require("../validation/update-wallet");
+const validateConfirmationInput = require("../validation/confirmation");
+const validateResetPasswordInput = require("../validation/reset-password");
 
 const User = require("../models/User");
 const Token = require("../models/Token");
+
+const CLIENT_BASE_URL = "http://localhost:3000";
 
 router.post("/register", (req, res) => {
   const { errors, isValid } = validateRegisterInput(req.body);
@@ -68,43 +72,15 @@ router.post("/register", (req, res) => {
                         if (err) {
                           return res.status(500).send({ msg: err.message });
                         }
-
-                        // Send the email
-                        var transporter = nodemailer.createTransport(
-                          smtpTransport({
-                            service: "gmail",
-                            host: "smtp.gmail.com",
-                            port: 465,
-                            secure: false,
-                            auth: {
-                              user: "jxking890@gmail.com",
-                              pass: "M0n9b8v7"
-                            }
-                          })
-                        );
-                        var mailOptions = {
-                          from: "no-reply@yourwebapplication.com",
-                          to: user.email,
-                          subject: "Account Verification Token",
-                          text:
-                            "Welcome to BitHFT!\n\n" +
-                            "Complete your registration by clicking below: \n\nhttp://" +
-                            "localhost:3000" +
-                            "/confirmation/" +
-                            token.token +
-                            "\n\nThank you,\n\nBitHFT Team"
-                        };
-
-                        transporter.sendMail(mailOptions, function(err) {
-                          if (err) {
-                            return res.status(500).json({ msg: err.message });
-                          }
+                        sendConfirmationEmail(user.email,token.token).then(()=>{
                           return res.status(200).json({
                             msg:
                               "A verification email has been sent to " +
                               user.email +
                               "."
                           });
+                        }).catch((err)=>{
+                          return res.status(500).json({ msg: err.message });
                         });
                       });
                     })
@@ -117,6 +93,166 @@ router.post("/register", (req, res) => {
       });
     }
   });
+});
+
+router.post("/resendConfirmationEmail", (req,res) => {
+  const { errors, isValid } = validateConfirmationInput(req.body);
+  // Check validation
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
+  User.findOne({ email: req.body.email }).then(user => {
+    if (!user) {
+      errors.msg = "Email doesn't exist";
+      return res.status(400).json(errors);
+    } 
+    if(user.isVerified){
+      errors.msg = "Email is already verified";
+      return res.status(400).json(errors);
+    }
+    Token.findOne({_userId:user._id}).then(token =>{
+      if(!token){
+        errors.msg = "Email not registered";
+        return res.status(400).json(errors);
+      }
+      if(token.lastResentAt){
+        let differentMins = moment(Date.now()).diff(token.lastResentAt, 'minutes');
+        if(differentMins < 2)
+        {
+          errors.msg = "You have already sent an email in the last 2 mins, please try again in 2             minutes";
+          return res.status(400).json(errors);
+        }
+      }
+      sendConfirmationEmail(user.email, token.token).then(()=>{
+        token.lastResentAt = Date.now();
+        token.save().then(token => console.log("token updated")).catch(err => console.log(err));
+        return res.status(200).json({
+          msg:
+            "A verification email has been sent to " +
+            user.email +
+            "."
+        });
+      }).catch((err)=>{
+        return res.status(500).json({ msg: err.message });
+      });
+    });
+  });
+});
+function sendConfirmationEmail(userEmail, verificationToken){
+  return sendEmail("no-reply@yourwebapplication.com",userEmail,"Account Verification Token",
+  "Welcome to BitHFT!\n\n" +
+  "Complete your registration by clicking below: \n\n" +
+  CLIENT_BASE_URL +
+  "/confirmation/" +
+  verificationToken +
+  "\n\nThank you,\n\nBitHFT Team");
+};
+
+function sendEmail(from, to, subject, body){
+  return new Promise((resolve, reject)=>{
+    var transporter = nodemailer.createTransport(
+      smtpTransport({
+        service: "gmail",
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: false,
+        auth: {
+          user: "jxking890@gmail.com",
+          pass: "M0n9b8v7"
+        }
+      })
+    );
+    var mailOptions = {
+      from: from,
+      to: to,
+      subject: subject,
+      text:body
+    };
+    transporter.sendMail(mailOptions, function(err) {
+        if (err) {
+          return reject(err);
+        }
+        resolve();
+    });
+  });
+}
+
+router.post("/forgotPassword", (req,res) =>{
+  const { errors, isValid } = validateConfirmationInput(req.body);
+  // Check validation
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
+  User.findOne({ email: req.body.email }).then(user => {
+    if (!user) {
+      errors.msg = "Email doesn't exist";
+      return res.status(400).json(errors);
+    } 
+    if(user.resetTokenCreatedAt){
+      let differnceInMinutes = moment(Date.now()).diff(user.resetTokenCreatedAt, 'minutes');
+      if(differnceInMinutes < 5){
+        errors.msg = "We have already sent an email to this address, please try again later.";
+        return res.status(400).json(errors);
+      }
+    }
+    let randomToken = crypto.randomBytes(16).toString("hex");
+    bcrypt.genSalt(10, (err, salt)=>{
+      if(err) throw err;
+      bcrypt.hash(randomToken,salt,(error,hash)=>{
+        if(error) throw error;
+        user.resetPassToken = hash;
+        user.resetTokenCreatedAt = Date.now();
+        user.save().then(updatedUser => {
+          sendEmail("no-reply@yourwebapplication.com",updatedUser.email,"Reset Password",
+            "Hello,\n\n" +
+            "Please reset your password by going to the following link: \n\n" +
+            CLIENT_BASE_URL +
+            "/reset-password/" +
+            salt +"/"+
+            randomToken +
+            "\n\nThank you,\n\nBitHFT Team").then(()=>{
+              return res.status(200).json({msg:"Email sent sucessfully"});
+            })
+            .catch(err => res.status(400).json({msg: "Error sending email."}));
+        }).catch(er => res.status(400).json({msg: "Error sending email."}));
+      })
+    });
+  });
+});
+
+router.post("/resetPassword", (req,res)=> {
+    const { errors, isValid } = validateResetPasswordInput(req.body);
+      // Check validation
+    if (!isValid) {
+      return res.status(400).json(errors);
+    }
+    let data = req.body;
+    bcrypt.hash(data.token,data.salt,(error, hashedToken)=>{
+      if(error) return res.status(400).json({msg: "Error while resetting password."});
+      User.findOne({resetPassToken: hashedToken}).then(user=>{
+        if(user.resetTokenCreatedAt){
+          let differnceInMinutes = moment(Date.now()).diff(user.resetTokenCreatedAt, 'minutes');
+          if(differnceInMinutes > 30){
+            errors.msg = "Token has expired. Please try again.";
+            return res.status(400).json(errors);
+          }
+        }
+        bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(data.newPassword, salt, (err, passwordHash) => {
+            if (err) throw err;
+            user.password = passwordHash;
+            user.resetPassToken = '';
+            user.resetTokenCreatedAt = null;
+            user
+              .save()
+              .then(updatedUser => {
+                return res.status(200).json({msg: "Password Updated Successfully"})
+              })
+              .catch(err => res.status(500).json({msg: "Unable to update password at this time."}));
+          });
+        });
+      }).catch((err) => res.status(400).json({msg: "Invalid URL."}));
+    });
 });
 
 router.post("/login", (req, res) => {

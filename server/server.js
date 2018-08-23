@@ -54,7 +54,7 @@ var rule = new schedule.RecurrenceRule();
 rule.hour = 0;
 rule.minute = 1;
 //Run scheduler
-var j = schedule.scheduleJob("*/59 * * * *", async function(){
+var j = schedule.scheduleJob("*/3 * * * *", async function(){
     await confirmTransactions();
     processPayments();
 });

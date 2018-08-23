@@ -173,7 +173,7 @@ router.post('/confirmTransaction', (req,res) => {
                     task.update("blockchaintransactions",{_id:payment._id},{transactionStatus: tranactionResult});
                     task.run().then(results=>{
                         return res.status(200).json(payment);
-                    }).then(err=>{
+                    }).catch(err=>{
                         return res.status(500).json("Error in confirmation");
                     });
                 }).catch(err=>{

@@ -190,6 +190,7 @@ export const createBlockchainTransactionOnAPI = (currentTransaction) => dispatch
     .post(BASE_URL+'/api/admin/createTransaction',currentTransaction)
     .then(res => {
         console.log(res.data);
+        dispatch(loadUsers());
     })
     .catch(err =>
         {

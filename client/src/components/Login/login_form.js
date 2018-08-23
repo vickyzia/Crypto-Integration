@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import "./css/login_form.css";
 import { loginUser } from "../../actions/authActions";
 import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
+import { withRouter,NavLink } from "react-router-dom";
 
 class LoginForm extends Component {
   constructor() {
@@ -85,6 +85,7 @@ class LoginForm extends Component {
               value={this.state.password}
               className="form-control login_input"
             />
+            <NavLink to="/forgot-password">Forgot Password?</NavLink>
             {errors.password && (
               <div className="help-block login_err_msg">
                 {errors.password}

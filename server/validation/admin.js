@@ -45,7 +45,7 @@ module.exports ={
     },
     validateTransactionInput : data => {
         let errors = {};
-        data.tokens = !isEmpty(data.tokens) ? data.tokens: 0;
+        data.tokens = !isEmpty(data.tokens) ? Number(data.tokens): 0;
         data.fromAddress = !isEmpty(data.fromAddress) ? data.fromAddress : '';
         data.toAddress = !isEmpty(data.toAddress) ? data.toAddress : '';
         data.transactionId = !isEmpty(data.transactionId) ? data.transactionId : '';  

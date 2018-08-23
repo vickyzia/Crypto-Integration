@@ -54,6 +54,13 @@ const UserSchema = new Schema({
     isEnabled: {
         type:Boolean,
         default: true
+    },
+    resetPassToken: {
+        type: String,
+        default: ''
+    },
+    resetTokenCreatedAt:{
+        type: Date
     }
 });
 

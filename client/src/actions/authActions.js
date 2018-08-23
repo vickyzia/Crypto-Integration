@@ -3,7 +3,7 @@ import setAuthToken from '../utils/setAuthToken';
 import jwt_decode from 'jwt-decode';
 
 import {
-    SET_CURRENT_USER, GET_ERRORS
+    SET_CURRENT_USER, GET_ERRORS, UPDATE_REG_EMAIL
 } from './types';
 import {BASE_URL} from '../utils/constants';
 
@@ -11,7 +11,14 @@ import {BASE_URL} from '../utils/constants';
 export const registerUser = (userData, history) => dispatch => {
     axios
         .post(BASE_URL+'/api/users/register', userData)
-        .then(res => history.push('/after-register'))
+        .then(res => {
+            history.push('/after-register');
+            dispatch({
+                type: UPDATE_REG_EMAIL,
+                payload: userData.email
+            });
+        
+        })
         .catch(err =>
             {
                 console.log("error in register");

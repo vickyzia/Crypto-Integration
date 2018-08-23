@@ -60,7 +60,6 @@ const BlockchainTransactions = Loadable({
 
 
 
-
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/dashboard', exact: true, name: 'Home', component: DefaultLayout },
