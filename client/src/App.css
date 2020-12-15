@@ -1,0 +1,43 @@
+@import url("https://fonts.googleapis.com/css?family=Cutive+Mono|Gruppo|Jura|Quicksand");
+
+@font-face {
+  /* font-family: "Quicksand", sans-serif; */
+  font-family: "Jura", sans-serif;
+  /* font-family: "Cutive Mono", monospace; */
+  /* font-family: "Gruppo", cursive; */
+}
+
+* {
+  /* font-family: "Quicksand", sans-serif; */
+  font-family: "Jura", sans-serif;
+  letter-spacing: 2px;
+  /* font-family: "Cutive Mono", monospace; */
+  /* font-family: "Gruppo", cursive; */
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #222; 
+  border: 1px solid transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgba(88, 88, 88, 0.7);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(88, 88, 88, 0.85);
+}
+
+.App {
+  /* font-family: "Quicksand", sans-serif; */
+  font-family: "Jura", sans-serif;
+  /* font-family: "Cutive Mono", monospace; */
+  /* font-family: "Gruppo", cursive; */
+}

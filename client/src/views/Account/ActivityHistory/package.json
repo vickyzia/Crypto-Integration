@@ -1,0 +1,6 @@
+{
+  "name": "ActivityHistory",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./ActivityHistory.js"
+}

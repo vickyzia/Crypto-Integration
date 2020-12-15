@@ -1,0 +1,47 @@
+.full_screen_message_container{
+    height: 80vh;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.full_screen_message{
+    padding: 20px 40px;
+    background-color: #000;
+    border: 1px solid transparent;
+    box-shadow: 0 0 4px #444;
+}
+
+.full_screen_message,
+.full_screen_message a{
+    color: #ddd;
+    text-shadow: 0 0 4px #00ffff;
+}
+
+#home_myVideo {
+    position: fixed;
+    z-index: -10;
+    width: 100%;
+    object-fit: cover;
+    height: 100%;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+  }
+  
+  #home_transparent_bg{
+    position: fixed;
+    z-index: -1;
+    width: 100%;
+    object-fit: cover;
+    height: 100%;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+  }

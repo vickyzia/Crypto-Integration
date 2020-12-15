@@ -1,0 +1,81 @@
+
+  .dashboard_countdown-col {
+    display: inline-block;
+    margin: 6px;
+  }
+  
+  .dashboard_countdown-col-element {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    background-color: #81D8D0;
+    border: 1px solid #56A5EC;
+    border-radius: 3px;
+  }
+  
+  .dashboard_countdown_text_1,
+  .dashboard_countdown_text_2
+   {
+    color: rgb(31, 30, 10);
+    /* text-shadow: 0px 0px 4px #888; */
+  }
+  
+  .dashboard_countdown_text_1 {
+    margin: 2px 0px 0px 0px;
+  }
+  
+  .dashboard_countdown_text_2 {
+    margin-bottom: 6px;
+  }
+
+  /* Media Responsiveness */
+
+
+  @media only screen and (max-width: 767px) {
+    .dashboard_countdown_text_1 {
+      font-size: 16px;
+    }
+    .dashboard_countdown_text_2 {
+      font-size: 12px;
+    }
+    .dashboard_countdown-col-element{
+      width: 40px;
+    }
+  }
+  
+  @media only screen and (min-width: 768px) {
+    .dashboard_countdown_text_1 {
+      font-size: 22px;
+    }
+    .dashboard_countdown_text_2 {
+      font-size: 16px;
+    }
+    .dashboard_countdown-col-element{
+      width: 54px;
+    }
+  }
+  
+  @media only screen and (min-width: 980px) {
+    .dashboard_countdown_text_1 {
+      font-size: 22px;
+    }
+    .dashboard_countdown_text_2 {
+      font-size: 18px;
+    }
+    .dashboard_countdown-col-element{
+      width: 58px;
+    }
+  }
+  
+  @media only screen and (min-width: 1200px) {
+  }
+
+
+
+
+
+
+
+
+
+

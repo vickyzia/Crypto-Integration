@@ -1,0 +1,77 @@
+.bit_card_container{
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.4);
+    background-color: #fff;
+    text-align: center;
+  }
+  
+  .bit_card_title{
+    border-bottom: 1px solid #ccc;
+    background-color: #eef;
+    padding: 3px 0px;
+  }
+
+  .bit_card_title_fiverr{
+    border-bottom: 1px solid #ccc;
+    background-color: rgb(77, 3, 3);
+    padding: 3px 0px;
+    color: white;
+  }
+
+  .bit_card_content{
+    padding: 10px;
+  }
+
+.bit_flex_column{
+    display: flex;
+    flex-flow: column wrap;
+}
+
+.bit_flex_row{
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.bit_full_width{
+    width: 100%;
+}
+  
+  .bit_mt_10{
+      margin-top: 10px;
+  }
+
+  .bit_mt_20{
+      margin-top: 20px;
+  }
+
+  .bit_mb_10{
+      margin-bottom: 10px;
+  }
+
+  .bit_mb_20{
+      margin-bottom: 20px;
+  }
+
+  .bit_align_center{
+      text-align: center;
+  }
+
+  .bit_m_10{
+      margin: 10px;
+  }
+
+  .bit_m_20{
+      margin: 20px;
+  }
+
+  .bit_red{
+      color: red;
+  }
+
+  .bit_scrollx{
+      overflow-x: scroll;
+  }
+
+  .bit_align_left{
+      text-align: left;
+  }

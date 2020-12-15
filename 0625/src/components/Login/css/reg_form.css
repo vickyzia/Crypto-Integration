@@ -1,0 +1,151 @@
+.reg_form {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid transparent;
+  box-shadow: 0 0 4px #444;
+  padding: 10px 40px;
+}
+
+.reg_form_container{
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.reg_form a {
+  text-decoration: underline;
+}
+
+.reg_input {
+  background-color: transparent;
+  color: #222;
+  padding: 15px;
+  margin: 10px;
+  border: 1px solid #999;
+}
+
+.reg_form_title {
+  margin: 20px;
+}
+
+.reg_err_msg{
+  text-shadow: none;
+  color: #b20000;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+::placeholder {
+  /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #333;
+  opacity: 1; /* Firefox */
+}
+
+:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: #333;
+}
+
+::-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: #333;
+}
+
+.regBtn {
+  background-color: transparent;
+  color: #222;
+  border: 1px solid #bbb;
+}
+
+.regBtn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: 0.3s;
+}
+
+.reg_disclaimer {
+  margin-left: 4px;
+  padding-bottom: 2px;
+}
+
+.reg_checkbox {
+  height: 30px;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+}
+
+
+@media only screen and (max-width: 767px) {
+  .reg_form_title{
+    font-size:24px;
+  }
+  .reg_input{
+    min-width:220px;
+  }
+  .reg_disclaimer{
+    font-size:14px;
+  }
+  .regBtn{
+    margin: 25px 0px;
+    font-size: 16px;
+    padding: 10px 12px;
+  }
+  .reg_checkbox_iphone{
+    display:none;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .reg_form_title{
+    font-size:24px;
+  }
+  .reg_input{
+    min-width:280px;
+  }
+  .reg_disclaimer{
+    font-size:14px;
+  }
+  .regBtn{
+    margin: 25px 0px;
+    font-size: 16px;
+    padding: 10px 12px;
+  }
+}
+
+@media only screen and (min-width: 980px) {
+  .reg_form_title{
+    font-size:24px;
+  }
+  .reg_input{
+    min-width:280px;
+  }
+  .reg_disclaimer{
+    font-size:12px;
+  }
+  .regBtn{
+    margin: 25px 0px;
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .reg_form_title{
+    font-size:24px;
+  }
+  .reg_input{
+    min-width:280px;
+  }
+  .reg_disclaimer{
+    font-size:12px;
+  }
+  .regBtn{
+    margin: 25px 0px;
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+}
